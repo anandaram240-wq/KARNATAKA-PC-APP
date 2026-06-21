@@ -80,16 +80,14 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen, user, onLo
       )}
       
       <aside className={cn(
-        "h-screen w-64 fixed left-0 top-0 z-50 bg-surface-container flex flex-col py-6 pr-4 border-r border-white/5 transition-transform duration-300 lg:translate-x-0",
+        "h-screen w-64 fixed left-0 top-0 z-50 bg-surface-container flex flex-col py-6 pr-4 border-r border-black/10 dark:border-white/5 transition-transform duration-300 lg:translate-x-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {/* Logo Section with KSP Badge */}
         <div className="px-6 mb-8 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-secondary/15 rounded-xl border border-secondary/30 flex items-center justify-center text-secondary">
-              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current animate-pulse">
-                <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" />
-              </svg>
+            <div className="w-10 h-10 bg-primary/10 rounded-xl border border-primary/20 flex items-center justify-center text-primary text-lg">
+              ⭐
             </div>
             <div>
               <h1 className="text-base font-black text-on-surface tracking-tight leading-none">KSP MASTER</h1>
@@ -114,13 +112,13 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen, user, onLo
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "w-full flex items-center gap-3 px-6 py-3 rounded-xl ml-2 transition-all duration-200 font-bold text-sm hover:translate-x-1",
+                  "w-full flex items-center gap-3 px-6 py-3 rounded-xl ml-2 transition-all duration-200 font-bold text-sm hover:translate-x-1 cursor-pointer border-none",
                   isActive
-                    ? "bg-primary-container text-on-primary-container border-l-4 border-secondary shadow-lg"
+                    ? "bg-primary/10 text-primary border-l-4 border-primary shadow-sm"
                     : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
                 )}
               >
-                <item.icon size={18} className={isActive ? "text-secondary" : "text-on-surface-variant"} />
+                <item.icon size={18} className={isActive ? "text-primary" : "text-on-surface-variant"} />
                 {item.label}
                 {'badge' in item && (item as any).badge > 0 && (
                   <span className="ml-auto text-[10px] font-black bg-error text-white rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
@@ -135,7 +133,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen, user, onLo
             <button
               onClick={() => { setActiveTab('admin'); setIsOpen(false); }}
               className={cn(
-                'w-full flex items-center gap-3 px-6 py-3 rounded-xl ml-2 transition-all duration-200 font-black text-sm mt-2 border',
+                'w-full flex items-center gap-3 px-6 py-3 rounded-xl ml-2 transition-all duration-200 font-black text-sm mt-2 border cursor-pointer',
                 activeTab === 'admin'
                   ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white border-amber-300 shadow-md animate-pulse'
                   : 'text-amber-700 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/20'

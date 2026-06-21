@@ -4,6 +4,7 @@ import { cn } from '../lib/utils';
 import { TakeTest } from './TakeTest';
 import pyqsData from '../data/pyqs.json';
 import { useLang } from '../lib/LanguageContext';
+import { translateUI, translateSubject, translateTopic } from '../lib/translations';
 
 interface PYQ {
   id: number;
@@ -261,58 +262,100 @@ export function MockTests() {
       {/* Header */}
       <div>
         <h2 className="text-3xl font-black text-primary tracking-tight">CBT Test Series (ಅಭ್ಯಾಸ ಪರೀಕ್ಷೆಗಳು)</h2>
-        <p className="text-on-surface-variant text-sm mt-1 max-w-lg">
-          Complete KSP Constable & Sub-Inspector Previous Year Questions (2014–2024) mapped into dynamic mock test series.
+        <p className="text-on-surface-variant text-sm mt-1 max-w-lg font-medium">
+          {lang === 'kn' 
+            ? 'ವಿಷಯವಾರು ಹಾಗೂ ಪೂರ್ಣ ಪ್ರಮಾಣದ KSP ಮಾದರಿ ಪರೀಕ್ಷೆಗಳು (2014-2024).' 
+            : 'Complete KSP Constable & Sub-Inspector Previous Year Questions (2014–2024) mapped into dynamic mock test series.'}
         </p>
       </div>
 
       {/* Stats Banner */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-primary text-white rounded-2xl p-6 relative overflow-hidden shadow-lg">
+        {/* Predicted Score Card */}
+        <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-6 relative overflow-hidden shadow-lg border border-black/20">
           <div className="absolute -right-4 -bottom-4 opacity-10"><Award size={80} /></div>
           <div className="relative z-10">
-            <p className="text-[10px] font-bold text-primary-fixed-dim uppercase tracking-wider mb-1">Average Accuracy</p>
-            <p className="text-4xl font-black tracking-tighter">{avgAccuracy}%</p>
-            <p className="text-xs text-primary-fixed-dim mt-2">
-              {totalCompleted > 0 ? `Based on completed mock records` : 'Take mocks to calculate accuracy'}
+            <p className="text-[10px] font-black text-indigo-300 uppercase tracking-wider mb-1">
+              {lang === 'kn' ? 'ಮುನ್ಸೂಚಿತ ಸ್ಕೋರ್' : 'Predicted Score'}
+            </p>
+            <p className="text-4xl font-black tracking-tighter">-- / 100</p>
+            <p className="text-xs text-indigo-200/70 mt-2">
+              {totalCompleted > 0 
+                ? `${lang === 'kn' ? 'ನಿಮ್ಮ ನಿಖರತೆ ಆಧಾರಿತ:' : 'Based on accuracy:'} ${avgAccuracy}%` 
+                : (lang === 'kn' ? 'ಮೌಲ್ಯಮಾಪನ ಪಡೆಯಲು ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ' : 'Take mocks to calculate accuracy')}
             </p>
           </div>
         </div>
 
-        <div className="bg-surface-container rounded-2xl p-6 shadow-sm border border-black/10 dark:border-white/5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-tertiary-container/30 border border-tertiary/30 rounded-full flex items-center justify-center text-tertiary">
-            <CheckCircle2 size={24} />
-          </div>
-          <div>
-            <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Completed Mocks</p>
-            <p className="text-2xl font-black text-white">{totalCompleted}</p>
+        {/* Mocks Completed Card with Circle Progress */}
+        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-black/10 dark:border-white/5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="relative flex items-center justify-center">
+              <svg className="w-16 h-16 transform -rotate-90">
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="26"
+                  stroke="currentColor"
+                  className="text-surface-container-high"
+                  strokeWidth="5"
+                  fill="transparent"
+                />
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="26"
+                  stroke="currentColor"
+                  className="text-primary"
+                  strokeWidth="5"
+                  fill="transparent"
+                  strokeDasharray={2 * Math.PI * 26}
+                  strokeDashoffset={2 * Math.PI * 26 * (1 - Math.min(totalCompleted, 100) / 100)}
+                />
+              </svg>
+              <span className="absolute text-sm font-black text-on-surface">{totalCompleted}</span>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                {lang === 'kn' ? 'ಪೂರ್ಣಗೊಂಡ ಮಾದರಿ ಪರೀಕ್ಷೆಗಳು' : 'Completed Mocks'}
+              </p>
+              <p className="text-sm font-bold text-on-surface-variant/80">
+                {lang === 'kn' ? 'ಗುರಿ: ೧೦೦ ಪರೀಕ್ಷೆಗಳು' : 'Goal: 100 Mocks'}
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="bg-surface-container rounded-2xl p-6 shadow-sm border border-black/10 dark:border-white/5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-secondary/15 border border-secondary/40 rounded-full flex items-center justify-center text-secondary">
-            <BarChart3 size={24} />
+        {/* Total PYQs Card */}
+        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-black/10 dark:border-white/5 flex items-center gap-4">
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+            <FileText size={24} />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Coverage Status</p>
-            <p className="text-sm font-black text-white mt-1 leading-tight">2014–2024 KSP Syllabus</p>
+            <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+              {lang === 'kn' ? 'ಲಭ್ಯವಿರುವ ಒಟ್ಟು PYQಗಳು' : 'Total PYQs Available'}
+            </p>
+            <p className="text-2xl font-black text-on-surface">{allQuestions.length.toLocaleString()}</p>
+            <p className="text-xs text-on-surface-variant mt-1">2014–2024 Syllabus Mapped</p>
           </div>
         </div>
       </div>
 
       {/* Mode Tabs */}
-      <div className="flex bg-surface-container rounded-2xl p-1.5 w-fit border border-black/10 dark:border-white/5">
+      <div className="flex bg-surface-container-lowest rounded-2xl p-1.5 w-fit border border-black/10 dark:border-white/5 gap-1.5">
         {([
-          { id: 'full' as const, label: '100+ Full Mock Series', icon: Target },
-          { id: 'subject' as const, label: 'Subject Tests', icon: BookOpen },
-          { id: 'topic' as const, label: 'Topic Tests', icon: Layers },
+          { id: 'full' as const, label: lang === 'kn' ? '೧೦೦+ ಪೂರ್ಣ ಮಾದರಿ ಸರಣಿ' : '100+ Full Mock Series', icon: Target },
+          { id: 'subject' as const, label: lang === 'kn' ? 'ವಿಷಯವಾರು ಪರೀಕ್ಷೆಗಳು' : 'Subject Tests', icon: BookOpen },
+          { id: 'topic' as const, label: lang === 'kn' ? 'ವಿಷಯವಾರು ಕೌಶಲ್ಯ ಪರೀಕ್ಷೆಗಳು' : 'Topic Tests', icon: Layers },
         ]).map(mode => (
           <button
             key={mode.id}
             onClick={() => setActiveMode(mode.id)}
             className={cn(
-              "px-5 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center gap-2",
-              activeMode === mode.id ? "bg-surface-container-highest text-white shadow-sm" : "text-on-surface-variant hover:bg-white/5"
+              "px-5 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center gap-2 border cursor-pointer",
+              activeMode === mode.id 
+                ? "bg-primary text-white border-primary shadow-sm" 
+                : "text-on-surface-variant hover:bg-surface-container bg-surface-container-lowest border-black/10 dark:border-white/5"
             )}
           >
             <mode.icon size={14} />
@@ -325,11 +368,13 @@ export function MockTests() {
       {activeMode === 'full' && (
         <div className="space-y-6">
           <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-2xl p-6">
-            <h3 className="font-black text-white text-base flex items-center gap-2">
+            <h3 className="font-black text-on-surface text-base flex items-center gap-2">
               <Target size={18} className="text-secondary" /> KSP Full CBT Exam Series
             </h3>
-            <p className="text-xs text-on-surface-variant mt-2 leading-relaxed max-w-xl">
-              100 structured exam papers covering all subjects in equal proportions. Values are dynamically mutated in Math and Reasoning to test your actual concepts.
+            <p className="text-xs text-on-surface-variant mt-2 leading-relaxed max-w-xl font-medium">
+              {lang === 'kn' 
+                ? '೧೦೦ ಪೂರ್ಣ ಪ್ರಮಾಣದ ಪರೀಕ್ಷೆಗಳು. ಗಣಿತ ಮತ್ತು ತಾರ್ಕಿಕ ವಿಷಯಗಳಲ್ಲಿ ನಿಖರ ಪದ್ಧತಿಯ ಪ್ರಶ್ನೆಗಳು.' 
+                : '100 structured exam papers covering all subjects in equal proportions. Values are dynamically mutated in Math and Reasoning to test your actual concepts.'}
             </p>
           </div>
 
@@ -341,32 +386,32 @@ export function MockTests() {
               const isDone = !!record;
 
               return (
-                <div key={idx} className={`bg-surface-container rounded-2xl p-5 border transition-all ${
-                  isDone ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-black/10 dark:border-white/5 bg-surface-container-lowest hover:border-primary/20 dark:hover:border-white/10'
+                <div key={idx} className={`bg-surface-container-lowest rounded-2xl p-5 border transition-all ${
+                  isDone ? 'border-emerald-500/20 bg-emerald-500/5 shadow-sm' : 'border-black/10 dark:border-white/5 hover:border-primary/20 dark:hover:border-white/10'
                 }`}>
                   <div className="flex justify-between items-start mb-3">
                     <span className="text-[10px] font-black text-secondary bg-secondary/15 px-2 py-0.5 rounded-full uppercase tracking-wider">Test #{idx}</span>
-                    {isDone && <CheckCircle2 className="text-emerald-400" size={16} />}
+                    {isDone && <CheckCircle2 className="text-emerald-500" size={16} />}
                   </div>
-                  <h4 className="font-bold text-sm text-white mb-2 truncate">KSP Full Test #{idx}</h4>
+                  <h4 className="font-black text-sm text-on-surface mb-2 truncate">KSP Full Test #{idx}</h4>
                   
-                  <div className="flex items-center gap-3 text-[10px] text-on-surface-variant mb-5">
-                    <span className="flex items-center gap-1"><Clock size={10} /> 90 Min</span>
-                    <span className="w-1 h-1 bg-slate-700 rounded-full"></span>
-                    <span>Syllabus Coverage</span>
+                  <div className="flex items-center gap-3 text-[10px] text-on-surface-variant font-bold mb-5">
+                    <span className="flex items-center gap-1"><Clock size={12} /> 90 Min</span>
+                    <span className="w-1 h-1 bg-slate-400 dark:bg-slate-700 rounded-full"></span>
+                    <span>100 Qs</span>
                   </div>
 
                   {isDone ? (
                     <div className="space-y-3">
                       <div className="bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-xl text-center">
-                        <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest leading-none">Accuracy</p>
-                        <p className="text-sm font-black text-white mt-1 leading-none">
+                        <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none">Accuracy</p>
+                        <p className="text-sm font-black text-on-surface mt-1 leading-none">
                           {Math.round((record.score / record.total) * 100)}%
                         </p>
                       </div>
                       <button
                         onClick={() => startMock('full', idx)}
-                        className="w-full py-2 bg-surface-container-low hover:bg-surface-container-high text-on-surface rounded-xl text-xs font-bold transition-all border border-black/10 dark:border-white/5 active:scale-95"
+                        className="w-full py-2 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl text-xs font-bold transition-all border border-black/10 dark:border-white/5 active:scale-95 cursor-pointer"
                       >
                         Retake Exam
                       </button>
@@ -374,7 +419,7 @@ export function MockTests() {
                   ) : (
                     <button
                       onClick={() => startMock('full', idx)}
-                      className="w-full bg-primary text-white py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 hover:bg-primary-container active:scale-95 transition-all shadow-md shadow-primary/20 border border-primary/20"
+                      className="w-full bg-[#1e1b4b] hover:bg-[#312e81] text-white py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow-md border border-black/10 cursor-pointer"
                     >
                       <Play size={12} fill="currentColor" /> Take Test
                     </button>
@@ -394,25 +439,31 @@ export function MockTests() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {subjects.map(subject => {
+              const subjectQs = allQuestions.filter(q => q.subject === subject);
               return (
-                <div key={subject} className="bg-surface-container rounded-2xl overflow-hidden hover:shadow-md transition-all border border-black/10 dark:border-white/5 group">
-                  <div className={cn("h-2 bg-gradient-to-r", getSubjectGradient(subject))}></div>
-                  <div className="p-5">
-                    <div className="text-3xl mb-3">{getSubjectIcon(subject)}</div>
-                    <h4 className="font-bold text-primary mb-1">{subject}</h4>
-                    <p className="text-xs text-on-surface-variant mb-4">Mastery status: Active</p>
-                    
-                    <div className="flex items-center gap-3 text-[10px] text-on-surface-variant mb-5">
-                      <span className="flex items-center gap-1"><Clock size={10} /> 30 Min</span>
-                      <span className="w-1 h-1 bg-slate-700 rounded-full"></span>
-                      <span>Syllabus Coverage</span>
+                <div key={subject} className="bg-surface-container-lowest rounded-2xl overflow-hidden hover:shadow-md transition-all border border-black/10 dark:border-white/5 flex flex-col justify-between group">
+                  <div>
+                    <div className={cn("h-2 bg-gradient-to-r", getSubjectGradient(subject))}></div>
+                    <div className="p-5">
+                      <div className="text-3xl mb-3">{getSubjectIcon(subject)}</div>
+                      <h4 className="font-black text-on-surface text-base mb-1">{translateSubject(subject, lang)}</h4>
+                      <p className="text-[10px] text-on-surface-variant mb-4 font-semibold">
+                        {subjectQs.length.toLocaleString()} {lang === 'kn' ? 'ಲಭ್ಯವಿರುವ ಪ್ರಶ್ನೆಗಳು' : 'Available PYQs'}
+                      </p>
+                      
+                      <div className="flex items-center gap-3 text-[10px] text-on-surface-variant font-bold mb-5">
+                        <span className="flex items-center gap-1"><Clock size={12} /> 30 Min</span>
+                        <span className="w-1 h-1 bg-slate-400 dark:bg-slate-700 rounded-full"></span>
+                        <span className="flex items-center gap-1"><FileText size={12} /> 25 Qs</span>
+                      </div>
                     </div>
-
+                  </div>
+                  <div className="px-5 pb-5">
                     <button
                       onClick={() => startMock('subject', 1, subject)}
-                      className="w-full bg-primary text-white py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 hover:bg-primary-container active:scale-95 transition-all border border-primary/20 shadow-md shadow-primary/10"
+                      className="w-full bg-[#1e1b4b] hover:bg-[#312e81] text-white py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all border border-black/10 cursor-pointer shadow-md shadow-indigo-950/15"
                     >
-                      <Play size={12} fill="currentColor" /> Practice Test
+                      <Play size={12} fill="currentColor" /> {lang === 'kn' ? 'ಪರೀಕ್ಷೆ ಆರಂಭಿಸಿ' : 'Start Mock'}
                     </button>
                   </div>
                 </div>
@@ -430,20 +481,20 @@ export function MockTests() {
           </h3>
 
           {/* Subject Selector */}
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
             {subjects.map(s => (
               <button
                 key={s}
                 onClick={() => { setSelectedSubject(s); setSelectedTopic(''); }}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 border",
+                  "px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 border cursor-pointer",
                   selectedSubject === s
                     ? "bg-primary text-white border-primary shadow-sm"
-                    : "bg-surface-container text-on-surface-variant border-black/10 dark:border-white/5 hover:bg-surface-container-high"
+                    : "bg-surface-container-lowest text-on-surface-variant border-black/10 dark:border-white/5 hover:bg-surface-container"
                 )}
               >
                 <span>{getSubjectIcon(s)}</span>
-                {s}
+                {translateSubject(s, lang)}
               </button>
             ))}
           </div>
@@ -451,24 +502,29 @@ export function MockTests() {
           {/* Topics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(syllabus[selectedSubject] || {}).map(([topic, count], idx) => {
+              const topicQs = allQuestions.filter(q => q.subject === selectedSubject && q.topic === topic);
               return (
-                <div key={topic} className="bg-surface-container rounded-2xl p-5 border border-black/10 dark:border-white/5 hover:border-black/20 dark:hover:border-white/10 transition-all group">
-                  <div className="flex justify-between items-start mb-3">
-                    <h4 className="font-bold text-white text-xs">{topic}</h4>
-                    <span className="bg-primary/15 text-primary border border-primary/25 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase">Skill Set</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 text-[10px] text-on-surface-variant mb-4">
-                    <span className="flex items-center gap-1"><Clock size={10} /> 20 Min</span>
-                    <span className="w-1 h-1 bg-slate-700 rounded-full"></span>
-                    <span>Syllabus Target</span>
+                <div key={topic} className="bg-surface-container-lowest rounded-2xl p-5 border border-black/10 dark:border-white/5 hover:border-primary/20 dark:hover:border-white/10 transition-all flex flex-col justify-between group">
+                  <div>
+                    <div className="flex justify-between items-start mb-3 gap-2">
+                      <h4 className="font-black text-on-surface text-sm truncate" title={translateTopic(topic, lang)}>{translateTopic(topic, lang)}</h4>
+                      <span className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase shrink-0">
+                        {topicQs.length} Qs
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 text-[10px] text-on-surface-variant font-bold mb-5">
+                      <span className="flex items-center gap-1"><Clock size={12} /> 20 Min</span>
+                      <span className="w-1 h-1 bg-slate-400 dark:bg-slate-700 rounded-full"></span>
+                      <span>Syllabus Target</span>
+                    </div>
                   </div>
 
                   <button
                     onClick={() => startMock('topic', idx + 1, selectedSubject, topic)}
-                    className="w-full bg-primary/10 text-primary py-2 rounded-xl text-xs font-black flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-colors active:scale-95"
+                    className="w-full bg-[#1e1b4b] hover:bg-[#312e81] text-white py-2 rounded-xl text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all border border-black/10 cursor-pointer"
                   >
-                    <Play size={12} fill="currentColor" /> Practice Test
+                    <Play size={12} fill="currentColor" /> {lang === 'kn' ? 'ಅಭ್ಯಾಸ ಆರಂಭಿಸಿ' : 'Practice Test'}
                   </button>
                 </div>
               );

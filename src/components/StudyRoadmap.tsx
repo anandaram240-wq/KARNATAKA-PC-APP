@@ -674,51 +674,51 @@ function SetupScreen({ onSetup }: { onSetup: (days: number) => void }) {
         <p className="text-indigo-300 text-xs">Built on 2,499+ real PYQs (2014–2021)</p>
       </div>
 
-      <div className="border-2 border-amber-900/40 rounded-2xl p-4" style={{ background: 'rgba(120,53,15,0.1)' }}>
-        <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3 flex items-center gap-1.5">
+      <div className="border border-amber-500/30 dark:border-amber-900/40 rounded-2xl p-4 bg-amber-500/5">
+        <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-3 flex items-center gap-1.5">
           <Star size={11} /> Topper Wisdom
         </p>
         <div style={{ minHeight: 80 }}>
-          <p className="text-xs text-slate-200 font-semibold leading-relaxed italic mb-3">{w.quote}</p>
+          <p className="text-xs text-on-surface font-semibold leading-relaxed italic mb-3">{w.quote}</p>
           <div className="flex items-center gap-2">
             <span className="text-xl">{w.icon}</span>
             <div>
-              <p className="text-[11px] font-black text-slate-300">{w.name}</p>
-              <p className="text-[10px] text-zinc-500">{w.title}</p>
+              <p className="text-[11px] font-black text-on-surface">{w.name}</p>
+              <p className="text-[10px] text-on-surface-variant">{w.title}</p>
             </div>
           </div>
         </div>
         <div className="flex gap-1 mt-3 justify-center">
           {TOPPER_WISDOM.map((_, i) => (
-            <button key={i} onClick={() => setWisdomIdx(i)} className={`h-1.5 rounded-full transition-all ${i === wisdomIdx ? 'bg-amber-500 w-4' : 'bg-zinc-700 w-1.5'}`} />
+            <button key={i} onClick={() => setWisdomIdx(i)} className={`h-1.5 rounded-full transition-all cursor-pointer ${i === wisdomIdx ? 'bg-amber-500 w-4' : 'bg-surface-container-highest dark:bg-zinc-700 w-1.5'}`} />
           ))}
         </div>
       </div>
 
       <div>
-        <p className="font-black text-slate-200 text-sm mb-3 flex items-center gap-2">
-          <Calendar size={14} className="text-indigo-400" /> How many days until your KSP exam?
+        <p className="font-black text-on-surface text-sm mb-3 flex items-center gap-2">
+          <Calendar size={14} className="text-indigo-500 dark:text-indigo-400" /> How many days until your KSP exam?
         </p>
         <div className="grid grid-cols-1 gap-2">
           {presets.map(p => (
             <button key={p.days} onClick={() => setDays(p.days)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all ${days === p.days ? 'text-white shadow-lg' : 'border-zinc-800 bg-zinc-950/50 text-slate-400 hover:border-zinc-700'}`}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all cursor-pointer ${days === p.days ? 'text-white shadow-lg border-transparent' : 'border-black/10 dark:border-zinc-800 bg-surface-container-lowest text-on-surface-variant hover:border-black/25 dark:hover:border-zinc-700'}`}
               style={days === p.days ? { background: p.color, borderColor: p.color } : {}}>
               <span>{p.label}</span>
-              <span className={`text-[11px] font-medium ${days === p.days ? 'text-white/80' : 'text-zinc-600'}`}>{p.days}d · {p.desc}</span>
+              <span className={`text-[11px] font-medium ${days === p.days ? 'text-white/80' : 'text-on-surface-variant/70'}`}>{p.days}d · {p.desc}</span>
             </button>
           ))}
         </div>
         <div className="flex items-center gap-3 mt-3">
-          <span className="text-sm text-zinc-500">Custom:</span>
+          <span className="text-sm text-on-surface-variant font-bold">Custom:</span>
           <input type="number" min={1} max={365} value={days}
             onChange={e => setDays(Math.max(1, parseInt(e.target.value) || 1))}
-            className="border-2 border-zinc-700 rounded-xl px-3 py-2 text-sm w-24 font-bold focus:outline-none focus:border-indigo-500 bg-zinc-900 text-slate-100" />
+            className="border border-black/10 dark:border-zinc-700 rounded-xl px-3 py-2 text-sm w-24 font-bold focus:outline-none focus:border-primary bg-surface-container-lowest text-on-surface" />
         </div>
       </div>
 
       <button onClick={() => onSetup(days)}
-        className="w-full text-white font-black py-4 rounded-2xl text-base shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+        className="w-full text-white font-black py-4 rounded-2xl text-base shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 border border-primary/20 cursor-pointer"
         style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
         <Zap size={18} /> Build My KSP Roadmap
       </button>

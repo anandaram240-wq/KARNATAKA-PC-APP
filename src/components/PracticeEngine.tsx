@@ -1035,7 +1035,7 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
           </div>
         </div>
 
-        {/* Subject Cards */}
+        {/* Subject Tabs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {subjects.map(subject => {
             const count = allQuestions.filter(q => q.subject === subject).length;
@@ -1046,19 +1046,22 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
                 key={subject}
                 onClick={() => { setSelectedSubject(subject); setSelectedTopic('all'); setBranchFilter('all'); }}
                 className={cn(
-                  'relative overflow-hidden rounded-2xl p-5 text-left transition-all duration-300 border',
-                  isActive ? 'border-primary/35 dark:border-primary/20 bg-primary/5 shadow-lg scale-[1.02]' : 'border-black/10 dark:border-white/5 bg-surface-container-lowest/50 shadow-sm hover:shadow-md hover:scale-[1.01]'
+                  'relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300 border flex items-center justify-between cursor-pointer',
+                  isActive 
+                    ? 'border-primary bg-primary/5 text-primary shadow-md ring-2 ring-primary/20' 
+                    : 'border-black/10 dark:border-white/5 bg-surface-container-lowest text-on-surface-variant hover:border-black/20 dark:hover:border-white/10'
                 )}
               >
-                <div className={cn('absolute inset-0 bg-gradient-to-br opacity-10', getSubjectColor(subject))} />
-                <div className="relative z-10">
-                  <div className="text-3xl mb-3">{getSubjectIcon(subject)}</div>
-                  <h3 className="font-bold text-primary text-sm mb-1">{translateSubject(subject, lang)}</h3>
-                  <p className="text-xs text-secondary font-black mt-1">
-                    {count} {lang === 'kn' ? 'ಪ್ರಶ್ನೆಗಳು' : 'Questions'}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{getSubjectIcon(subject)}</span>
+                  <div>
+                    <h3 className="font-black text-sm">{translateSubject(subject, lang)}</h3>
+                    <p className="text-[10px] font-bold opacity-85 mt-0.5">
+                      {count.toLocaleString()} {lang === 'kn' ? 'ಪ್ರಶ್ನೆಗಳು' : 'PYQs'} · {topicCount} {lang === 'kn' ? 'ವಿಷಯಗಳು' : 'Topics'}
+                    </p>
+                  </div>
                 </div>
-                {isActive && <div className="absolute top-3 right-3 w-3 h-3 bg-primary rounded-full animate-pulse" />}
+                {isActive && <CheckCircle2 size={18} className="text-primary shrink-0 ml-2" />}
               </button>
             );
           })}
@@ -1067,7 +1070,7 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container-high">
+            <div className="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-black/10 dark:border-white/5">
               <h3 className="font-bold text-primary mb-4 flex items-center gap-2 text-sm">
                 <Filter size={16} /> {translateUI('filters', lang)}
               </h3>
@@ -1081,8 +1084,10 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
                         key={b}
                         onClick={() => { setBranchFilter(b); setSelectedTopic('all'); }}
                         className={cn(
-                          'px-3 py-1.5 rounded-lg text-xs font-bold transition-colors',
-                          branchFilter === b ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                          'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border',
+                          branchFilter === b 
+                            ? 'bg-primary text-white border-primary shadow-sm' 
+                            : 'bg-surface-container-lowest text-on-surface-variant border-black/10 dark:border-white/5 hover:border-black/20 dark:hover:border-white/10 hover:bg-surface-container-low'
                         )}
                       >
                         {b === 'all' ? translateUI('branchAll', lang) : translateTopic(b, lang)}
@@ -1095,7 +1100,7 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
               <div className="mb-4">
                 <label className="text-[10px] font-bold text-on-surface-variant uppercase mb-2 block">{translateUI('topic', lang)}</label>
                 <select
-                  className="w-full bg-surface-container p-2 rounded-lg text-sm border-none focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full bg-surface-container-lowest p-2 rounded-lg text-sm border border-black/10 dark:border-white/5 focus:ring-2 focus:ring-primary outline-none text-on-surface"
                   value={selectedTopic}
                   onChange={e => setSelectedTopic(e.target.value)}
                 >
@@ -1122,8 +1127,10 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
                       key={d}
                       onClick={() => setDifficultyFilter(d)}
                       className={cn(
-                        'px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors',
-                        difficultyFilter === d ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                        'px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer border',
+                        difficultyFilter === d 
+                          ? 'bg-primary text-white border-primary shadow-sm' 
+                          : 'bg-surface-container-lowest text-on-surface-variant border-black/10 dark:border-white/5 hover:border-black/20 dark:hover:border-white/10 hover:bg-surface-container-low'
                       )}
                     >
                       {d === 'all' ? translateUI('diffAll', lang) : d === 'easy' ? translateUI('diffEasy', lang) : d === 'medium' ? translateUI('diffMedium', lang) : translateUI('diffHard', lang)}
@@ -1135,7 +1142,7 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
               <div className="mb-4">
                 <label className="text-[10px] font-bold text-on-surface-variant uppercase mb-2 block">{translateUI('examYear', lang)}</label>
                 <select
-                  className="w-full bg-surface-container p-2 rounded-lg text-sm border-none focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full bg-surface-container-lowest p-2 rounded-lg text-sm border border-black/10 dark:border-white/5 focus:ring-2 focus:ring-primary outline-none text-on-surface"
                   value={yearFilter}
                   onChange={e => setYearFilter(e.target.value)}
                 >
@@ -1149,19 +1156,16 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
                 </select>
               </div>
 
-              <div className="pt-4 border-t border-surface-container">
-                <div className="flex items-center gap-2 mb-2">
-                  <BarChart3 size={14} className="text-primary" />
-                  <span className="text-xs font-bold text-primary">{translateUI('syllabusStatus', lang)}</span>
-                </div>
-                <p className="text-sm font-black text-white mt-1">{translateUI('completeCoverage', lang)}</p>
+              <div className="pt-4 border-t border-black/10 dark:border-white/5">
+                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">{lang === 'kn' ? 'ಹೊಂದುವ PYQಗಳು' : 'Matching PYQs'}</p>
+                <p className="text-3xl font-black text-primary mt-1">{filteredQuestions.length.toLocaleString()}</p>
               </div>
             </div>
 
             {filteredQuestions.length > 0 && (
               <button
                 onClick={startPractice}
-                className="w-full bg-primary text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-container transition-colors shadow-md hover:shadow-lg"
+                className="w-full bg-primary text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md hover:shadow-lg border-none cursor-pointer"
               >
                 <Zap size={18} /> {translateUI('startPracticeDrill', lang)}
               </button>
@@ -1181,26 +1185,36 @@ Review the chat history and the student's response. Guide them step-by-step. Do 
                 return (
                   <div
                     key={topic}
-                    onClick={() => setSelectedTopic(topic)}
+                    onClick={() => setSelectedTopic(topic === selectedTopic ? 'all' : topic)}
                     className={cn(
-                      'bg-surface-container-lowest/50 rounded-xl p-5 shadow-sm border cursor-pointer transition-all hover:shadow-md hover:scale-[1.01]',
-                      isSelected ? 'border-primary/40 dark:border-primary/25 bg-primary/5 shadow-[0_0_12px_rgba(91,76,245,0.1)]' : 'border-black/10 dark:border-white/5 hover:border-primary/20 dark:hover:border-primary/10'
+                      'bg-surface-container-lowest rounded-xl p-5 shadow-sm border cursor-pointer transition-all hover:shadow-md hover:scale-[1.01]',
+                      isSelected 
+                        ? 'border-primary bg-primary/5 shadow-[0_0_12px_rgba(91,76,245,0.15)] ring-2 ring-primary/20' 
+                        : 'border-black/10 dark:border-white/5 hover:border-primary/45'
                     )}
                   >
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-bold text-primary text-sm truncate mr-1" title={translateTopic(topic, lang)}>{translateTopic(topic, lang)}</h4>
-                      <span className="text-[10px] font-black text-secondary shrink-0 ml-auto">
-                        {topicQs.length} {lang === 'kn' ? 'ಪ್ರಶ್ನೆಗಳು' : 'Questions'}
-                      </span>
+                    <div className="flex justify-between items-start mb-1">
+                      <h4 className="font-black text-on-surface text-sm truncate mr-2" title={translateTopic(topic, lang)}>
+                        {translateTopic(topic, lang)}
+                      </h4>
+                      <span className="text-xl font-black text-primary leading-none">{topicQs.length}</span>
                     </div>
-                    <p className="text-[10px] text-on-surface-variant mb-3">{translateUI('conceptPracticeActive', lang)}</p>
-                    <div className="flex gap-0.5 h-1.5 rounded-full overflow-hidden bg-surface-container mb-2">
-                      {easy > 0 && <div className="bg-emerald-400 rounded-full" style={{ width: `${(easy / topicQs.length) * 100}%` }} />}
-                      {medium > 0 && <div className="bg-amber-400 rounded-full" style={{ width: `${(medium / topicQs.length) * 100}%` }} />}
-                      {hard > 0 && <div className="bg-red-400 rounded-full" style={{ width: `${(hard / topicQs.length) * 100}%` }} />}
+                    <p className="text-[10px] text-on-surface-variant mb-3">
+                      {topicQs.length} {lang === 'kn' ? 'ಪ್ರಶ್ನೆಗಳು' : 'Questions'}
+                    </p>
+                    
+                    {/* Multi-segmented Progress Bar */}
+                    <div className="flex h-1.5 rounded-full overflow-hidden bg-surface-container mb-3.5">
+                      {easy > 0 && <div className="bg-emerald-500" style={{ width: `${(easy / topicQs.length) * 100}%` }} />}
+                      {medium > 0 && <div className="bg-amber-500" style={{ width: `${(medium / topicQs.length) * 100}%` }} />}
+                      {hard > 0 && <div className="bg-red-500" style={{ width: `${(hard / topicQs.length) * 100}%` }} />}
                     </div>
-                    <div className="flex gap-3 text-[10px] text-on-surface-variant">
-                      <span>{translateUI('includesDrills', lang)}</span>
+                    
+                    {/* Colored difficulty breakdown text */}
+                    <div className="flex gap-2.5 text-[10px] font-bold text-on-surface-variant/80">
+                      {easy > 0 && <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {easy} {lang === 'kn' ? 'ಸುಲಭ' : 'Easy'}</span>}
+                      {medium > 0 && <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> {medium} {lang === 'kn' ? 'ಮಧ್ಯಮ' : 'Med'}</span>}
+                      {hard > 0 && <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> {hard} {lang === 'kn' ? 'ಕಠಿಣ' : 'Hard'}</span>}
                     </div>
                   </div>
                 );
