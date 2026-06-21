@@ -1,0 +1,1042 @@
+[
+  {
+    "id": 1,
+    "subject": "Arithmetic",
+    "topic": "Units",
+    "question_en": "One cusec means ______ litres of fluid flowing in a second.",
+    "question_kn": "ಒಂದು ಕ್ಯೂಸೆಕ್ ಎಂದರೆ ಒಂದು ಸೆಕೆಂಡಿನಲ್ಲಿ ______ ಲೀಟರ್ ದ್ರವ ಹರಿಯುತ್ತದೆ.",
+    "options_en": [
+      "500",
+      "1000",
+      "28.32",
+      "10"
+    ],
+    "options_kn": [
+      "500",
+      "1000",
+      "28.32",
+      "10"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 21,
+    "subject": "Arithmetic",
+    "topic": "Time & Work",
+    "question_en": "45 men complete a piece of work in 30 days working for 12 hrs. a day. In how many days 60 men complete the work working 10 hours a day ?",
+    "question_kn": "45 ಜನರು 12 ಗಂಟೆಗಳ ಕಾಲ ಕೆಲಸ ಮಾಡಿ ಒಂದು ಕೆಲಸವನ್ನು 30 ದಿನಗಳಲ್ಲಿ ಮುಗಿಸುತ್ತಾರೆ. 60 ಜನರು 10 ಗಂಟೆಗಳ ಕಾಲ ಕೆಲಸ ಮಾಡಿದರೆ ಎಷ್ಟು ದಿನಗಳಲ್ಲಿ ಕೆಲಸ ಮುಗಿಸುತ್ತಾರೆ?",
+    "options_en": [
+      "27 days",
+      "30 days",
+      "24 days",
+      "None of the above"
+    ],
+    "options_kn": [
+      "27 ದಿನಗಳು",
+      "30 ದಿನಗಳು",
+      "24 ದಿನಗಳು",
+      "ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 22,
+    "subject": "Arithmetic",
+    "topic": "Speed Distance Time",
+    "question_en": "Ram and Bharat travel the same distance at the speed of 6 Kms per hour and 10 Kms per hour respectively. If Ram takes 30 minutes longer than Bharat, the distance travelled by each is",
+    "question_kn": "ರಾಮ್ ಮತ್ತು ಭರತ್ ಒಂದೇ ದೂರವನ್ನು ಕ್ರಮವಾಗಿ ಗಂಟೆಗೆ 6 ಕಿ.ಮೀ. ಮತ್ತು 10 ಕಿ.ಮೀ. ವೇಗದಲ್ಲಿ ಪ್ರಯಾಣಿಸುತ್ತಾರೆ. ರಾಮ್ ಭರತ್ಗಿಂತ 30 ನಿಮಿಷ ಹೆಚ್ಚು ಸಮಯ ತೆಗೆದುಕೊಂಡರೆ, ಪ್ರತಿಯೊಬ್ಬರು ಪ್ರಯಾಣಿಸಿದ ದೂರ ಎಷ್ಟು?",
+    "options_en": [
+      "6 Km",
+      "10 Km",
+      "7.5 Km",
+      "20 Km"
+    ],
+    "options_kn": [
+      "6 ಕಿ.ಮೀ.",
+      "10 ಕಿ.ಮೀ.",
+      "7.5 ಕಿ.ಮೀ.",
+      "20 ಕಿ.ಮೀ."
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 26,
+    "subject": "Arithmetic",
+    "topic": "Number Series",
+    "question_en": "Fill in the blank: 9, 10, 27, 8, 16, ?",
+    "question_kn": "ಖಾಲಿ ಜಾಗವನ್ನು ಭರ್ತಿ ಮಾಡಿ: 9, 10, 27, 8, 16, ?",
+    "options_en": [
+      "32",
+      "44",
+      "24",
+      "50"
+    ],
+    "options_kn": [
+      "32",
+      "44",
+      "24",
+      "50"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 27,
+    "subject": "Arithmetic",
+    "topic": "Time & Work",
+    "question_en": "If 10 people can construct 20 houses in 30 days, how long it will take for 5 people to construct 10 houses?",
+    "question_kn": "10 ಜನರು 20 ಮನೆಗಳನ್ನು 30 ದಿನಗಳಲ್ಲಿ ನಿರ್ಮಿಸಬಲ್ಲರು, 5 ಜನರು 10 ಮನೆಗಳನ್ನು ನಿರ್ಮಿಸಲು ಎಷ್ಟು ದಿನ ಬೇಕಾಗುತ್ತದೆ?",
+    "options_en": [
+      "15 days",
+      "10 days",
+      "20 days",
+      "30 days"
+    ],
+    "options_kn": [
+      "15 ದಿನಗಳು",
+      "10 ದಿನಗಳು",
+      "20 ದಿನಗಳು",
+      "30 ದಿನಗಳು"
+    ],
+    "correctAnswer": 3
+  },
+  {
+    "id": 28,
+    "subject": "Arithmetic",
+    "topic": "Algebra",
+    "question_en": "One third of X's marks in Mathematics equals his score in Hindi subject. If X's total score in both subjects is 120, then what is his score in Hindi?",
+    "question_kn": "X ನ ಗಣಿತದ ಅಂಕಗಳಲ್ಲಿ ಮೂರನೇ ಒಂದು ಭಾಗವು ಹಿಂದಿ ವಿಷಯದ ಅಂಕಗಳಿಗೆ ಸಮಾನವಾಗಿದೆ. X ನ ಎರಡೂ ವಿಷಯಗಳ ಒಟ್ಟು ಅಂಕ 120 ಆದರೆ, ಹಿಂದಿಯಲ್ಲಿ ಅವನ ಅಂಕ ಎಷ್ಟು?",
+    "options_en": [
+      "30",
+      "50",
+      "40",
+      "60"
+    ],
+    "options_kn": [
+      "30",
+      "50",
+      "40",
+      "60"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 41,
+    "subject": "Arithmetic",
+    "topic": "Series",
+    "question_en": "BEFORE : BEERFO :: TRIBAL : ?",
+    "question_kn": "BEFORE : BEERFO :: TRIBAL : ?",
+    "options_en": [
+      "TLRAIB",
+      "RTLIAB",
+      "TLARIB",
+      "TLRAIB"
+    ],
+    "options_kn": [
+      "TLRAIB",
+      "RTLIAB",
+      "TLARIB",
+      "TLRAIB"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 57,
+    "subject": "Arithmetic",
+    "topic": "Squares",
+    "question_en": "How many perfect squares can be found below 500 ?",
+    "question_kn": "500 ಕ್ಕಿಂತ ಕೆಳಗೆ ಎಷ್ಟು ಪೂರ್ಣ ವರ್ಗಗಳನ್ನು ಕಾಣಬಹುದು?",
+    "options_en": [
+      "1",
+      "16",
+      "22",
+      "26"
+    ],
+    "options_kn": [
+      "1",
+      "16",
+      "22",
+      "26"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 58,
+    "subject": "Arithmetic",
+    "topic": "Interest",
+    "question_en": "The principal amount that yields a simple interest of Rs. 1,280 at 16% per annum for 8 months is Rs.",
+    "question_kn": "ವಾರ್ಷಿಕ 16% ರಂತೆ 8 ತಿಂಗಳಿಗೆ ರೂ. 1,280 ಸರಳ ಬಡ್ಡಿ ನೀಡುವ ಮೂಲಧನ ಎಷ್ಟು?",
+    "options_en": [
+      "10,000",
+      "12,000",
+      "12,800",
+      "14,000"
+    ],
+    "options_kn": [
+      "10,000",
+      "12,000",
+      "12,800",
+      "14,000"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 62,
+    "subject": "Arithmetic",
+    "topic": "Statistics",
+    "question_en": "Find out range for the following data : 130, 200, 261, 180, 205, 172, 152, 144",
+    "question_kn": "ಕೆಳಗಿನ ದತ್ತಾಂಶದ ವ್ಯಾಪ್ತಿಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ: 130, 200, 261, 180, 205, 172, 152, 144",
+    "options_en": [
+      "131",
+      "61",
+      "130",
+      "261"
+    ],
+    "options_kn": [
+      "131",
+      "61",
+      "130",
+      "261"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 68,
+    "subject": "Arithmetic",
+    "topic": "Time & Work",
+    "question_en": "A work will be completed in 36 days by 8 persons working for 8 hours in a day. In how many days the same work can be completed if the same number of persons work for 6 hours in a day is",
+    "question_kn": "8 ಜನರು ದಿನಕ್ಕೆ 8 ಗಂಟೆಗಳ ಕಾಲ ಕೆಲಸ ಮಾಡಿ 36 ದಿನಗಳಲ್ಲಿ ಕೆಲಸವನ್ನು ಮುಗಿಸುತ್ತಾರೆ. ಅದೇ ಸಂಖ್ಯೆಯ ಜನರು ದಿನಕ್ಕೆ 6 ಗಂಟೆಗಳ ಕಾಲ ಕೆಲಸ ಮಾಡಿದರೆ ಎಷ್ಟು ದಿನಗಳಲ್ಲಿ ಕೆಲಸ ಮುಗಿಯುತ್ತದೆ?",
+    "options_en": [
+      "48 days",
+      "42 days",
+      "52 days",
+      "46 days"
+    ],
+    "options_kn": [
+      "48 ದಿನಗಳು",
+      "42 ದಿನಗಳು",
+      "52 ದಿನಗಳು",
+      "46 ದಿನಗಳು"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 83,
+    "subject": "Arithmetic",
+    "topic": "Statistics",
+    "question_en": "Mode of 2, 3, 3, 5, 3, 5, 7, 3, 5 is",
+    "question_kn": "2, 3, 3, 5, 3, 5, 7, 3, 5 ರ ಬಹುಲಕ",
+    "options_en": [
+      "3",
+      "5",
+      "3 and 5",
+      "4"
+    ],
+    "options_kn": [
+      "3",
+      "5",
+      "3 ಮತ್ತು 5",
+      "4"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 84,
+    "subject": "Arithmetic",
+    "topic": "Coordinate Geometry",
+    "question_en": "If a person moves either 1 unit in the direction of positive X-axis or 1 unit in the direction of positive Y-axis per step. Then the number of steps required to reach (10, 12) starting from the origin (0, 0) is",
+    "question_kn": "ಒಬ್ಬ ವ್ಯಕ್ತಿಯು ಪ್ರತಿ ಹೆಜ್ಜೆಗೆ ಧನಾತ್ಮಕ X-ಅಕ್ಷದ ದಿಶೆಯಲ್ಲಿ 1 ಘಟಕ ಅಥವಾ ಧನಾತ್ಮಕ Y-ಅಕ್ಷದ ದಿಶೆಯಲ್ಲಿ 1 ಘಟಕ ಚಲಿಸುತ್ತಾನೆ. ಮೂಲ ಬಿಂದುವಿನಿಂದ (10, 12) ತಲುಪಲು ಎಷ್ಟು ಹೆಜ್ಜೆಗಳು ಬೇಕು?",
+    "options_en": [
+      "10",
+      "12",
+      "22",
+      "120"
+    ],
+    "options_kn": [
+      "10",
+      "12",
+      "22",
+      "120"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 111,
+    "subject": "Reasoning",
+    "topic": "Numbers",
+    "question_en": "If you write down all numbers from 1 to 100, how many times do you write 3?",
+    "question_kn": "1 ರಿಂದ 100 ರವರೆಗಿನ ಎಲ್ಲಾ ಸಂಖ್ಯೆಗಳನ್ನು ಬರೆದರೆ, 3 ಅನ್ನು ಎಷ್ಟು ಬಾರಿ ಬರೆಯುತ್ತೀರಿ?",
+    "options_en": [
+      "11",
+      "18",
+      "20",
+      "21"
+    ],
+    "options_kn": [
+      "11",
+      "18",
+      "20",
+      "21"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 112,
+    "subject": "Reasoning",
+    "topic": "Blood Relations",
+    "question_en": "A is B's sister, C is B's mother. D is C's father, E is D's mother, then how is A related to D?",
+    "question_kn": "A ಯು B ಯ ಸಹೋದರಿ, C ಯು B ಯ ತಾಯಿ. D ಯು C ಯ ತಂದೆ, E ಯು D ಯ ತಾಯಿ, ಹಾಗಾದರೆ A ಯು D ಗೆ ಏನಾಗುತ್ತಾಳೆ?",
+    "options_en": [
+      "Grand father",
+      "Grand mother",
+      "Daughter",
+      "Grand daughter"
+    ],
+    "options_kn": [
+      "ಅಜ್ಜ",
+      "ಅಜ್ಜಿ",
+      "ಮಗಳು",
+      "ಮೊಮ್ಮಗಳು"
+    ],
+    "correctAnswer": 3
+  },
+  {
+    "id": 113,
+    "subject": "Reasoning",
+    "topic": "Blood Relations",
+    "question_en": "Arun said \"This girl is the wife of the grandson of my mother\". Who is Arun to the girl?",
+    "question_kn": "ಅರುಣ್ ಹೇಳಿದರು \"ಈ ಹುಡುಗಿ ನನ್ನ ತಾಯಿಯ ಮೊಮ್ಮಗನ ಪತ್ನಿ\". ಅರುಣ್ ಆ ಹುಡುಗಿಗೆ ಯಾರು?",
+    "options_en": [
+      "Father",
+      "Grand father",
+      "Husband",
+      "Father in law"
+    ],
+    "options_kn": [
+      "ತಂದೆ",
+      "ಅಜ್ಜ",
+      "ಗಂಡ",
+      "ಮಾವ"
+    ],
+    "correctAnswer": 3
+  },
+  {
+    "id": 114,
+    "subject": "Reasoning",
+    "topic": "Number Series",
+    "question_en": "A class of boys stands in a single line, one boy is 19th in order from both the ends. How many boys are there in the class?",
+    "question_kn": "ಹುಡುಗರ ಒಂದು ತರಗತಿ ಸಾಲಿನಲ್ಲಿ ನಿಂತಿದೆ, ಒಬ್ಬ ಹುಡುಗ ಎರಡೂ ಕಡೆಯಿಂದ 19ನೇ ಸ್ಥಾನದಲ್ಲಿದ್ದಾನೆ. ತರಗತಿಯಲ್ಲಿ ಎಷ್ಟು ಹುಡುಗರಿದ್ದಾರೆ?",
+    "options_en": [
+      "37",
+      "38",
+      "39",
+      "27"
+    ],
+    "options_kn": [
+      "37",
+      "38",
+      "39",
+      "27"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 115,
+    "subject": "Reasoning",
+    "topic": "Calendar",
+    "question_en": "If 30th January 2003 was Thursday, what was the day on 2nd March 2003?",
+    "question_kn": "2003ನೇ ಇಸವಿಯ ಜನವರಿ 30ನೇ ದಿವಸವು ಗುರುವಾರವಾದರೆ, 2003ನೇ ಇಸವಿಯ ಮಾರ್ಚ್ 2ನೇ ದಿವಸವು ಯಾವ ವಾರ?",
+    "options_en": [
+      "Sunday",
+      "Thursday",
+      "Tuesday",
+      "Saturday"
+    ],
+    "options_kn": [
+      "ಭಾನುವಾರ",
+      "ಗುರುವಾರ",
+      "ಮಂಗಳವಾರ",
+      "ಶನಿವಾರ"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 157,
+    "subject": "Reasoning",
+    "topic": "Number Series",
+    "question_en": "Find out the wrong term in the series 2, 5, 10, 50, 500, 5000",
+    "question_kn": "2, 5, 10, 50, 500, 5000 ಸರಣಿಯಲ್ಲಿ ತಪ್ಪಾದ ಪದವನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ",
+    "options_en": [
+      "5000",
+      "500",
+      "10",
+      "50"
+    ],
+    "options_kn": [
+      "5000",
+      "500",
+      "10",
+      "50"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 158,
+    "subject": "Arithmetic",
+    "topic": "Profit Loss",
+    "question_en": "A gold bracelet is sold for Rs. 14,500 at the loss of 20%. What is the cost price for bracelet?",
+    "question_kn": "ಚಿನ್ನದ ಕಡಗವೊಂದನ್ನು 20% ನಷ್ಟದಲ್ಲಿ ರೂ. 14,500 ಕ್ಕೆ ಮಾರಲಾಗಿದೆ. ಕಡಗದ ಅಸಲು ಬೆಲೆ ಎಷ್ಟು?",
+    "options_en": [
+      "Rs. 18,125",
+      "Rs. 17,400",
+      "Rs. 15,225",
+      "Rs. 16,800"
+    ],
+    "options_kn": [
+      "ರೂ. 18,125",
+      "ರೂ. 17,400",
+      "ರೂ. 15,225",
+      "ರೂ. 16,800"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 176,
+    "subject": "Arithmetic",
+    "topic": "Basic",
+    "question_en": "How many pieces of 13.2 cm rope can be cut from a 330 cm rope?",
+    "question_kn": "330 ಸೆಂ.ಮೀ. ಉದ್ದದ ಹಗ್ಗದಿಂದ 13.2 ಸೆಂ.ಮೀ. ಉದ್ದದ ಎಷ್ಟು ತುಂಡುಗಳನ್ನು ಕತ್ತರಿಸಬಹುದು?",
+    "options_en": [
+      "25",
+      "28",
+      "21",
+      "35"
+    ],
+    "options_kn": [
+      "25",
+      "28",
+      "21",
+      "35"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 177,
+    "subject": "Arithmetic",
+    "topic": "Speed",
+    "question_en": "The speed of bus is 72 km/hr. The distance covered by bus in 5 sec. is",
+    "question_kn": "ಬಸ್ಸಿನ ವೇಗವು ಗಂಟೆಗೆ 72 ಕಿ.ಮೀ. ಆದರೆ, ಆ ಬಸ್ಸು 5 ಸೆಕೆಂಡಿನಲ್ಲಿ ಎಷ್ಟು ದೂರ ಕ್ರಮಿಸುತ್ತದೆ?",
+    "options_en": [
+      "50 m",
+      "74.5 m",
+      "100 m",
+      "60 m"
+    ],
+    "options_kn": [
+      "50 ಮೀಟರ್",
+      "74.5 ಮೀಟರ್",
+      "100 ಮೀಟರ್",
+      "60 ಮೀಟರ್"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 178,
+    "subject": "Reasoning",
+    "topic": "Series",
+    "question_en": "Look at series 7, 10, 8, 11, 9, 12. Which number should come next?",
+    "question_kn": "ಸರಣಿ 7, 10, 8, 11, 9, 12 ಅನ್ನು ಗಮನಿಸಿ. ಮುಂದಿನ ಸಂಖ್ಯೆ ಯಾವುದು?",
+    "options_en": [
+      "7",
+      "10",
+      "12",
+      "13"
+    ],
+    "options_kn": [
+      "7",
+      "10",
+      "12",
+      "13"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 179,
+    "subject": "Reasoning",
+    "topic": "Series",
+    "question_en": "In the series 2, 6, 18, 54, .... what is the next number?",
+    "question_kn": "2, 6, 18, 54, .... ಸರಣಿಯಲ್ಲಿ ಮುಂದಿನ ಸಂಖ್ಯೆ ಯಾವುದು?",
+    "options_en": [
+      "108",
+      "148",
+      "162",
+      "216"
+    ],
+    "options_kn": [
+      "108",
+      "148",
+      "162",
+      "216"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 180,
+    "subject": "Reasoning",
+    "topic": "Age",
+    "question_en": "Today is Varun's birthday. One year from today he will be twice as old as he was 12 yrs. ago. How old is Varun today?",
+    "question_kn": "ಇಂದು ವರುಣನ ಹುಟ್ಟುಹಬ್ಬ. ಇಂದಿನಿಂದ ಒಂದು ವರ್ಷದ ನಂತರ ಅವನಿಗೆ 12 ವರ್ಷಗಳ ಹಿಂದೆ ಇದ್ದ ವಯಸ್ಸಿನ ಎರಡರಷ್ಟು ವಯಸ್ಸಾಗಿರುತ್ತದೆ. ವರುಣನ ಪ್ರಸ್ತುತ ವಯಸ್ಸು ಎಷ್ಟು?",
+    "options_en": [
+      "20",
+      "22",
+      "25",
+      "27"
+    ],
+    "options_kn": [
+      "20",
+      "22",
+      "25",
+      "27"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 216,
+    "subject": "Arithmetic",
+    "topic": "Age",
+    "question_en": "Ramu is twice as old as Somu and 4 years elder to Kitti. Now Kitti is 8 years old. How old is Somu?",
+    "question_kn": "ರಾಮು ಸೋಮುವಿನಷ್ಟೇ ವಯಸ್ಸಿನ ಎರಡರಷ್ಟು ಮತ್ತು ಕಿಟ್ಟಿಗಿಂತ 4 ವರ್ಷ ದೊಡ್ಡವನು. ಈಗ ಕಿಟ್ಟಿಗೆ 8 ವರ್ಷ. ಹಾಗಾದರೆ ಸೋಮುವಿನ ವಯಸ್ಸು?",
+    "options_en": [
+      "2 Years",
+      "4 Years",
+      "6 Years",
+      "None of these"
+    ],
+    "options_kn": [
+      "2 ವರ್ಷ",
+      "4 ವರ್ಷ",
+      "6 ವರ್ಷ",
+      "ಇವುಗಳಲ್ಲಿ ಯಾವುದೂ ಅಲ್ಲ"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 235,
+    "subject": "Arithmetic",
+    "topic": "Geometry",
+    "question_en": "Length and breadth of a rectangle is in the ratio of 8:3. If the total area of rectangle is 96 sq. cms, then what is the length of the rectangle?",
+    "question_kn": "ಒಂದು ಆಯತದ ಉದ್ದ ಮತ್ತು ಅಗಲ 8:3 ಪ್ರಮಾಣದಲ್ಲಿವೆ. ಆಯತದ ವಿಸ್ತೀರ್ಣ 96 ಚ.ಸೆಂ.ಮೀ. ಆದರೆ, ಆಯತದ ಉದ್ದ ಎಷ್ಟು?",
+    "options_en": [
+      "18 cm",
+      "20 cm",
+      "14 cm",
+      "15 cm"
+    ],
+    "options_kn": [
+      "18 ಸೆಂ.ಮೀ.",
+      "20 ಸೆಂ.ಮೀ.",
+      "14 ಸೆಂ.ಮೀ.",
+      "15 ಸೆಂ.ಮೀ."
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 250,
+    "subject": "Reasoning",
+    "topic": "Direction",
+    "question_en": "A man is facing North. He turns 90° in the clockwise direction, then turns 45° in clockwise direction. Again turns 90° and 45° in clockwise direction only. Which direction is he facing now?",
+    "question_kn": "ಒಬ್ಬ ವ್ಯಕ್ತಿಯು ಉತ್ತರಕ್ಕೆ ಮುಖ ಮಾಡಿದ್ದಾನೆ. ಅವನು 90° ಪ್ರದಕ್ಷಿಣ ದಿಕ್ಕಿನಲ್ಲಿ ತಿರುಗುತ್ತಾನೆ, ನಂತರ 45° ಪ್ರದಕ್ಷಿಣ ದಿಕ್ಕಿನಲ್ಲಿ ತಿರುಗುತ್ತಾನೆ. ಮತ್ತೆ 90° ಮತ್ತು 45° ಪ್ರದಕ್ಷಿಣ ದಿಕ್ಕಿನಲ್ಲಿ ಮಾತ್ರ ತಿರುಗುತ್ತಾನೆ. ಹಾಗಾದರೆ ಅವನು ಈಗ ಯಾವ ದಿಕ್ಕಿನಲ್ಲಿ ಮುಖ ಮಾಡಿದ್ದಾನೆ?",
+    "options_en": [
+      "North",
+      "West",
+      "South-West",
+      "East"
+    ],
+    "options_kn": [
+      "ಉತ್ತರ",
+      "ಪಶ್ಚಿಮ",
+      "ನೈಋತ್ಯ",
+      "ಪೂರ್ವ"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 257,
+    "subject": "Reasoning",
+    "topic": "Counting",
+    "question_en": "How many triangles are found in the following diagram?",
+    "question_kn": "ಕೆಳಗಿನ ಚಿತ್ರದಲ್ಲಿ ಎಷ್ಟು ತ್ರಿಭುಜಗಳಿವೆ?",
+    "options_en": [
+      "32",
+      "38",
+      "40",
+      "42"
+    ],
+    "options_kn": [
+      "32",
+      "38",
+      "40",
+      "42"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 297,
+    "subject": "Reasoning",
+    "topic": "Series",
+    "question_en": "Fill in the next number in the series: 2, 5, 8, 11, 14, ?",
+    "question_kn": "ಸರಣಿಯ ಮುಂದಿನ ಸಂಖ್ಯೆಯನ್ನು ಭರ್ತಿ ಮಾಡಿ: 2, 5, 8, 11, 14, ?",
+    "options_en": [
+      "18",
+      "17",
+      "19",
+      "16"
+    ],
+    "options_kn": [
+      "18",
+      "17",
+      "19",
+      "16"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 298,
+    "subject": "Reasoning",
+    "topic": "Clock",
+    "question_en": "A tired Police Officer went to bed at 10 O'clock one night after setting alarm clock for noon the following day. When the alarm woke him up how many hours had he slept?",
+    "question_kn": "ಒಬ್ಬ ಆಯಾಸಗೊಂಡಿದ್ದ ಪೊಲೀಸ್ ಅಧಿಕಾರಿಯು ಒಂದು ದಿನ ರಾತ್ರಿ 10.00 ಗಂಟೆಗೆ ನಿದ್ರೆ ಹೋಗುತ್ತಾನೆ. ನಿದ್ರೆ ಹೋಗುವುದಕ್ಕೆ ಮುಂಚೆ ಮಾರನೇ ದಿನ ನಡು ಮಧ್ಯಾಹ್ನಕ್ಕೆ ಅಲಾರಾಂ ಇಟ್ಟುತ್ತಾನೆ. ಅಲಾರಾಂ ಅವನನ್ನು ಎಚ್ಚರಿಸಿದಾಗ, ಅವನು ಎಷ್ಟು ಗಂಟೆಗಳ ಕಾಲ ನಿದ್ರೆ ಮಾಡಿರುತ್ತಾನೆ?",
+    "options_en": [
+      "14",
+      "12",
+      "11",
+      "4"
+    ],
+    "options_kn": [
+      "14",
+      "12",
+      "11",
+      "4"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 299,
+    "subject": "Arithmetic",
+    "topic": "Speed Distance",
+    "question_en": "Two cars leave a roadside Restaurant at 1:00 p.m. One Travelling East at 60 Km/Hr and the other travelling West at 40 Km/Hr along a straight highway. At what time they would be 350 Km apart?",
+    "question_kn": "ಒಂದು ರಸ್ತೆಬದಿಯ ರೆಸ್ಟೋರೆಂಟ್ನಿಂದ ಮಧ್ಯಾಹ್ನ 1 ಗಂಟೆಗೆ ಎರಡು ಕಾರುಗಳು ಹೊರಡುತ್ತವೆ. ಅವುಗಳಲ್ಲಿ ಒಂದು ಕಾರು ಗಂಟೆಗೆ 60 ಕಿ.ಮೀ. ವೇಗದಲ್ಲಿ ಪೂರ್ವ ದಿಕ್ಕಿಗೆ ಮತ್ತು ಇನ್ನೊಂದು ಕಾರು ಗಂಟೆಗೆ 40 ಕಿ.ಮೀ. ವೇಗದಲ್ಲಿ ಪಶ್ಚಿಮ ದಿಕ್ಕಿಗೆ, ಒಂದು ನೇರವಾದ ಹೆದ್ದಾರಿಯಲ್ಲಿ ಚಲಿಸುತ್ತವೆ. ಯಾವ ಸಮಯದಲ್ಲಿ ಎರಡೂ ಕಾರುಗಳು ಒಂದಕ್ಕೊಂದು 350 ಕಿ.ಮೀ. ಅಂತರದಲ್ಲಿರುತ್ತವೆ?",
+    "options_en": [
+      "4.30 p.m.",
+      "2.30 p.m.",
+      "3.30 p.m.",
+      "5.30 p.m."
+    ],
+    "options_kn": [
+      "4.30 ಮಧ್ಯಾಹ್ನ",
+      "2.30 ಮಧ್ಯಾಹ್ನ",
+      "3.30 ಮಧ್ಯಾಹ್ನ",
+      "5.30 ಮಧ್ಯಾಹ್ನ"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 342,
+    "subject": "Arithmetic",
+    "topic": "BODMAS",
+    "question_en": "3 - 4 + 6 (3 - 2 ÷ 2) - 1 is equal to",
+    "question_kn": "3 - 4 + 6 (3 - 2 ÷ 2) - 1 ಇದರ ಬೆಲೆ",
+    "options_en": [
+      "10",
+      "11",
+      "1",
+      "None of these"
+    ],
+    "options_kn": [
+      "10",
+      "11",
+      "1",
+      "ಇವಾವುವೂ ಅಲ್ಲ"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 343,
+    "subject": "Reasoning",
+    "topic": "Series",
+    "question_en": "Continue the series 2, 4, 6, 10, 16, ___",
+    "question_kn": "ಸರಣಿಯನ್ನು ಮುಂದುವರಿಸಿ 2, 4, 6, 10, 16, ___",
+    "options_en": [
+      "26",
+      "22",
+      "20",
+      "32"
+    ],
+    "options_kn": [
+      "26",
+      "22",
+      "20",
+      "32"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 377,
+    "subject": "Reasoning",
+    "topic": "Venn Diagram",
+    "question_en": "Which diagram reflects the relationship between carrot, beans and vegetables?",
+    "question_kn": "ಕ್ಯಾರೆಟ್, ಬೀನ್ಸ್ ಮತ್ತು ತರಕಾರಿಗಳ ನಡುವಿನ ಸಂಬಂಧವನ್ನು ಯಾವ ಚಿತ್ರ ಸೂಚಿಸುತ್ತದೆ?",
+    "options_en": [
+      "Option A",
+      "Option B",
+      "Option C",
+      "Option D"
+    ],
+    "options_kn": [
+      "ಆಯ್ಕೆ A",
+      "ಆಯ್ಕೆ B",
+      "ಆಯ್ಕೆ C",
+      "ಆಯ್ಕೆ D"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 382,
+    "subject": "Arithmetic",
+    "topic": "Units",
+    "question_en": "One cusec means ______ litres of fluid flowing in a second.",
+    "question_kn": "ಒಂದು ಕ್ಯೂಸೆಕ್ ಎಂದರೆ ಒಂದು ಸೆಕೆಂಡಿನಲ್ಲಿ ______ ಲೀಟರ್ ದ್ರವ ಹರಿಯುತ್ತದೆ.",
+    "options_en": [
+      "500",
+      "1000",
+      "28.32",
+      "10"
+    ],
+    "options_kn": [
+      "500",
+      "1000",
+      "28.32",
+      "10"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 413,
+    "subject": "Arithmetic",
+    "topic": "Statistics",
+    "question_en": "Mode of 2, 3, 3, 5, 3, 5, 7, 3, 5 is",
+    "question_kn": "2, 3, 3, 5, 3, 5, 7, 3, 5 ರ ಬಹುಲಕ",
+    "options_en": [
+      "3",
+      "5",
+      "3 and 5",
+      "4"
+    ],
+    "options_kn": [
+      "3",
+      "5",
+      "3 ಮತ್ತು 5",
+      "4"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 414,
+    "subject": "Arithmetic",
+    "topic": "Coordinate Geometry",
+    "question_en": "If a person moves either 1 unit in the direction of positive X-axis or 1 unit in the direction of positive Y-axis per step. Then the number of steps required to reach (10, 12) starting from the origin (0, 0) is",
+    "question_kn": "ಒಬ್ಬ ವ್ಯಕ್ತಿಯು ಪ್ರತಿ ಹೆಜ್ಜೆಗೆ ಧನಾತ್ಮಕ X-ಅಕ್ಷದ ದಿಶೆಯಲ್ಲಿ 1 ಘಟಕ ಅಥವಾ ಧನಾತ್ಮಕ Y-ಅಕ್ಷದ ದಿಶೆಯಲ್ಲಿ 1 ಘಟಕ ಚಲಿಸುತ್ತಾನೆ. ಮೂಲ ಬಿಂದುವಿನಿಂದ (10, 12) ತಲುಪಲು ಎಷ್ಟು ಹೆಜ್ಜೆಗಳು ಬೇಕು?",
+    "options_en": [
+      "10",
+      "12",
+      "22",
+      "120"
+    ],
+    "options_kn": [
+      "10",
+      "12",
+      "22",
+      "120"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 460,
+    "subject": "Reasoning",
+    "topic": "Series",
+    "question_en": "Fill in the next number in the series: 2, 5, 8, 11, 14, ?",
+    "question_kn": "ಸರಣಿಯ ಮುಂದಿನ ಸಂಖ್ಯೆಯನ್ನು ಭರ್ತಿ ಮಾಡಿ: 2, 5, 8, 11, 14, ?",
+    "options_en": [
+      "18",
+      "17",
+      "19",
+      "16"
+    ],
+    "options_kn": [
+      "18",
+      "17",
+      "19",
+      "16"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 461,
+    "subject": "Reasoning",
+    "topic": "Clock",
+    "question_en": "A tired Police Officer went to bed at 10 O'clock one night after setting alarm clock for noon the following day. When the alarm woke him up how many hours had he slept?",
+    "question_kn": "ಒಬ್ಬ ಆಯಾಸಗೊಂಡಿದ್ದ ಪೊಲೀಸ್ ಅಧಿಕಾರಿಯು ಒಂದು ದಿನ ರಾತ್ರಿ 10.00 ಗಂಟೆಗೆ ನಿದ್ರೆ ಹೋಗುತ್ತಾನೆ. ನಿದ್ರೆ ಹೋಗುವುದಕ್ಕೆ ಮುಂಚೆ ಮಾರನೇ ದಿನ ನಡು ಮಧ್ಯಾಹ್ನಕ್ಕೆ ಅಲಾರಾಂ ಇಟ್ಟುತ್ತಾನೆ. ಅಲಾರಾಂ ಅವನನ್ನು ಎಚ್ಚರಿಸಿದಾಗ, ಅವನು ಎಷ್ಟು ಗಂಟೆಗಳ ಕಾಲ ನಿದ್ರೆ ಮಾಡಿರುತ್ತಾನೆ?",
+    "options_en": [
+      "14",
+      "12",
+      "11",
+      "4"
+    ],
+    "options_kn": [
+      "14",
+      "12",
+      "11",
+      "4"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 462,
+    "subject": "Arithmetic",
+    "topic": "Speed Distance",
+    "question_en": "Two cars leave a roadside Restaurant at 1:00 p.m. One Travelling East at 60 Km/Hr and the other travelling West at 40 Km/Hr along a straight highway. At what time they would be 350 Km apart?",
+    "question_kn": "ಒಂದು ರಸ್ತೆಬದಿಯ ರೆಸ್ಟೋರೆಂಟ್ನಿಂದ ಮಧ್ಯಾಹ್ನ 1 ಗಂಟೆಗೆ ಎರಡು ಕಾರುಗಳು ಹೊರಡುತ್ತವೆ. ಅವುಗಳಲ್ಲಿ ಒಂದು ಕಾರು ಗಂಟೆಗೆ 60 ಕಿ.ಮೀ. ವೇಗದಲ್ಲಿ ಪೂರ್ವ ದಿಕ್ಕಿಗೆ ಮತ್ತು ಇನ್ನೊಂದು ಕಾರು ಗಂಟೆಗೆ 40 ಕಿ.ಮೀ. ವೇಗದಲ್ಲಿ ಪಶ್ಚಿಮ ದಿಕ್ಕಿಗೆ, ಒಂದು ನೇರವಾದ ಹೆದ್ದಾರಿಯಲ್ಲಿ ಚಲಿಸುತ್ತವೆ. ಯಾವ ಸಮಯದಲ್ಲಿ ಎರಡೂ ಕಾರುಗಳು ಒಂದಕ್ಕೊಂದು 350 ಕಿ.ಮೀ. ಅಂತರದಲ್ಲಿರುತ್ತವೆ?",
+    "options_en": [
+      "4.30 p.m.",
+      "2.30 p.m.",
+      "3.30 p.m.",
+      "5.30 p.m."
+    ],
+    "options_kn": [
+      "4.30 ಮಧ್ಯಾಹ್ನ",
+      "2.30 ಮಧ್ಯಾಹ್ನ",
+      "3.30 ಮಧ್ಯಾಹ್ನ",
+      "5.30 ಮಧ್ಯಾಹ್ನ"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 472,
+    "subject": "Reasoning",
+    "topic": "Analogy",
+    "question_en": "BEFORE : BEERFO :: TRIBAL : ?",
+    "question_kn": "BEFORE : BEERFO :: TRIBAL : ?",
+    "options_en": [
+      "TLRAIB",
+      "RTLIAB",
+      "TLARIB",
+      "TLRAIB"
+    ],
+    "options_kn": [
+      "TLRAIB",
+      "RTLIAB",
+      "TLARIB",
+      "TLRAIB"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 488,
+    "subject": "Arithmetic",
+    "topic": "Squares",
+    "question_en": "How many perfect squares can be found below 500?",
+    "question_kn": "500 ಕ್ಕಿಂತ ಕೆಳಗೆ ಎಷ್ಟು ಪೂರ್ಣ ವರ್ಗಗಳನ್ನು ಕಾಣಬಹುದು?",
+    "options_en": [
+      "1",
+      "16",
+      "22",
+      "26"
+    ],
+    "options_kn": [
+      "1",
+      "16",
+      "22",
+      "26"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 489,
+    "subject": "Arithmetic",
+    "topic": "Interest",
+    "question_en": "The principal amount that yields a simple interest of Rs. 1,280 at 16% per annum for 8 months is Rs.",
+    "question_kn": "ವಾರ್ಷಿಕ 16% ರಂತೆ 8 ತಿಂಗಳಿಗೆ ರೂ. 1,280 ಸರಳ ಬಡ್ಡಿ ನೀಡುವ ಮೂಲಧನ ಎಷ್ಟು?",
+    "options_en": [
+      "10,000",
+      "12,000",
+      "12,800",
+      "14,000"
+    ],
+    "options_kn": [
+      "10,000",
+      "12,000",
+      "12,800",
+      "14,000"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "id": 493,
+    "subject": "Arithmetic",
+    "topic": "Statistics",
+    "question_en": "Find out range for the following data: 130, 200, 261, 180, 205, 172, 152, 144",
+    "question_kn": "ಕೆಳಗಿನ ದತ್ತಾಂಶದ ವ್ಯಾಪ್ತಿಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ: 130, 200, 261, 180, 205, 172, 152, 144",
+    "options_en": [
+      "131",
+      "61",
+      "130",
+      "261"
+    ],
+    "options_kn": [
+      "131",
+      "61",
+      "130",
+      "261"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 499,
+    "subject": "Arithmetic",
+    "topic": "Time & Work",
+    "question_en": "A work will be completed in 36 days by 8 persons working for 8 hours in a day. In how many days the same work can be completed if the same number of persons work for 6 hours in a day is",
+    "question_kn": "8 ಜನರು ದಿನಕ್ಕೆ 8 ಗಂಟೆಗಳ ಕಾಲ ಕೆಲಸ ಮಾಡಿ 36 ದಿನಗಳಲ್ಲಿ ಕೆಲಸವನ್ನು ಮುಗಿಸುತ್ತಾರೆ. ಅದೇ ಸಂಖ್ಯೆಯ ಜನರು ದಿನಕ್ಕೆ 6 ಗಂಟೆಗಳ ಕಾಲ ಕೆಲಸ ಮಾಡಿದರೆ ಎಷ್ಟು ದಿನಗಳಲ್ಲಿ ಕೆಲಸ ಮುಗಿಯುತ್ತದೆ?",
+    "options_en": [
+      "48 days",
+      "42 days",
+      "52 days",
+      "46 days"
+    ],
+    "options_kn": [
+      "48 ದಿನಗಳು",
+      "42 ದಿನಗಳು",
+      "52 ದಿನಗಳು",
+      "46 ದಿನಗಳು"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 514,
+    "subject": "Arithmetic",
+    "topic": "Statistics",
+    "question_en": "Mode of 2, 3, 3, 5, 3, 5, 7, 3, 5 is",
+    "question_kn": "2, 3, 3, 5, 3, 5, 7, 3, 5 ರ ಬಹುಲಕ",
+    "options_en": [
+      "3",
+      "5",
+      "3 and 5",
+      "4"
+    ],
+    "options_kn": [
+      "3",
+      "5",
+      "3 ಮತ್ತು 5",
+      "4"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "id": 515,
+    "subject": "Arithmetic",
+    "topic": "Coordinate Geometry",
+    "question_en": "If a person moves either 1 unit in the direction of positive X-axis or 1 unit in the direction of positive Y-axis per step. Then the number of steps required to reach (10, 12) starting from the origin (0, 0) is",
+    "question_kn": "ಒಬ್ಬ ವ್ಯಕ್ತಿಯು ಪ್ರತಿ ಹೆಜ್ಜೆಗೆ ಧನಾತ್ಮಕ X-ಅಕ್ಷದ ದಿಶೆಯಲ್ಲಿ 1 ಘಟಕ ಅಥವಾ ಧನಾತ್ಮಕ Y-ಅಕ್ಷದ ದಿಶೆಯಲ್ಲಿ 1 ಘಟಕ ಚಲಿಸುತ್ತಾನೆ. ಮೂಲ ಬಿಂದುವಿನಿಂದ (10, 12) ತಲುಪಲು ಎಷ್ಟು ಹೆಜ್ಜೆಗಳು ಬೇಕು?",
+    "options_en": [
+      "10",
+      "12",
+      "22",
+      "120"
+    ],
+    "options_kn": [
+      "10",
+      "12",
+      "22",
+      "120"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 546,
+    "subject": "Arithmetic",
+    "topic": "Age",
+    "question_en": "Ramu is twice as old as Somu and 4 years elder to Kitti. Now Kitti is 8 years old. How old is Somu?",
+    "question_kn": "ರಾಮು ಸೋಮುವಿನಷ್ಟೇ ವಯಸ್ಸಿನ ಎರಡರಷ್ಟು ಮತ್ತು ಕಿಟ್ಟಿಗಿಂತ 4 ವರ್ಷ ದೊಡ್ಡವನು. ಈಗ ಕಿಟ್ಟಿಗೆ 8 ವರ್ಷ. ಹಾಗಾದರೆ ಸೋಮುವಿನ ವಯಸ್ಸು?",
+    "options_en": [
+      "2 Years",
+      "4 Years",
+      "6 Years",
+      "None of these"
+    ],
+    "options_kn": [
+      "2 ವರ್ಷ",
+      "4 ವರ್ಷ",
+      "6 ವರ್ಷ",
+      "ಇವುಗಳಲ್ಲಿ ಯಾವುದೂ ಅಲ್ಲ"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 561,
+    "subject": "Arithmetic",
+    "topic": "Age",
+    "question_en": "Ramu is twice as old as Somu and 4 years elder to Kitti. Now Kitti is 8 years old. How old is Somu?",
+    "question_kn": "ರಾಮು ಸೋಮುವಿನಷ್ಟೇ ವಯಸ್ಸಿನ ಎರಡರಷ್ಟು ಮತ್ತು ಕಿಟ್ಟಿಗಿಂತ 4 ವರ್ಷ ದೊಡ್ಡವನು. ಈಗ ಕಿಟ್ಟಿಗೆ 8 ವರ್ಷ. ಹಾಗಾದರೆ ಸೋಮುವಿನ ವಯಸ್ಸು?",
+    "options_en": [
+      "2 Years",
+      "4 Years",
+      "6 Years",
+      "None of these"
+    ],
+    "options_kn": [
+      "2 ವರ್ಷ",
+      "4 ವರ್ಷ",
+      "6 ವರ್ಷ",
+      "ಇವುಗಳಲ್ಲಿ ಯಾವುದೂ ಅಲ್ಲ"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 580,
+    "subject": "Reasoning",
+    "topic": "Direction",
+    "question_en": "A man is facing North. He turns 90° in the clockwise direction, then turns 45° in clockwise direction. Again turns 90° and 45° in clockwise direction only. Which direction is he facing now?",
+    "question_kn": "ಒಬ್ಬ ವ್ಯಕ್ತಿಯು ಉತ್ತರಕ್ಕೆ ಮುಖ ಮಾಡಿದ್ದಾನೆ. ಅವನು 90° ಪ್ರದಕ್ಷಿಣ ದಿಕ್ಕಿನಲ್ಲಿ ತಿರುಗುತ್ತಾನೆ, ನಂತರ 45° ಪ್ರದಕ್ಷಿಣ ದಿಕ್ಕಿನಲ್ಲಿ ತಿರುಗುತ್ತಾನೆ. ಮತ್ತೆ 90° ಮತ್ತು 45° ಪ್ರದಕ್ಷಿಣ ದಿಕ್ಕಿನಲ್ಲಿ ಮಾತ್ರ ತಿರುಗುತ್ತಾನೆ. ಹಾಗಾದರೆ ಅವನು ಈಗ ಯಾವ ದಿಕ್ಕಿನಲ್ಲಿ ಮುಖ ಮಾಡಿದ್ದಾನೆ?",
+    "options_en": [
+      "North",
+      "West",
+      "South-West",
+      "East"
+    ],
+    "options_kn": [
+      "ಉತ್ತರ",
+      "ಪಶ್ಚಿಮ",
+      "ನೈಋತ್ಯ",
+      "ಪೂರ್ವ"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "id": 587,
+    "subject": "Reasoning",
+    "topic": "Counting",
+    "question_en": "How many triangles are found in the following diagram?",
+    "question_kn": "ಕೆಳಗಿನ ಚಿತ್ರದಲ್ಲಿ ಎಷ್ಟು ತ್ರಿಭುಜಗಳಿವೆ?",
+    "options_en": [
+      "32",
+      "38",
+      "40",
+      "42"
+    ],
+    "options_kn": [
+      "32",
+      "38",
+      "40",
+      "42"
+    ],
+    "correctAnswer": 1
+  }
+]
