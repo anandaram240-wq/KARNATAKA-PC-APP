@@ -108,7 +108,7 @@ function mutateMockQuestions(questions: PYQ[], testIndex: number): PYQ[] {
 }
 
 export function MockTests() {
-  const { questions: langQuestions } = useLang();
+  const { lang, questions: langQuestions } = useLang();
   const allQuestions = (langQuestions.length > 0 ? langQuestions : pyqsData) as PYQ[];
   const [activeMode, setActiveMode] = useState<'subject' | 'topic' | 'full'>('full');
   const [activeMock, setActiveMock] = useState<MockConfig | null>(null);
