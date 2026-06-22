@@ -4,7 +4,6 @@ import { SolutionDisplay } from './SolutionDisplay';
 import { cn } from '../lib/utils';
 import { cleanText } from '../lib/cleanText';
 import { startLiveSession, trackAnswer, finalizeSession } from '../lib/performanceEngine';
-import { enrichSolution, enrichedToText } from '../lib/solutionEnricher';
 
 interface PYQ {
   id: number;
@@ -192,13 +191,13 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => setShowSolutions(true)}
-              className="flex-1 bg-primary text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-container transition-colors"
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-700 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
             >
               <Eye size={18} /> Review Solutions
             </button>
             <button
               onClick={onClose}
-              className="flex-1 bg-surface-container text-primary py-3.5 rounded-xl font-bold hover:bg-surface-container-high transition-colors"
+              className="flex-1 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 py-3.5 rounded-xl font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
             >
               Return to Dashboard
             </button>
@@ -254,50 +253,41 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
 
               <div className="space-y-3 max-w-3xl">
                 {q.options.map((opt, idx) => {
-                  let stateClass = "border-surface-container-high";
-                  if (idx === q.correctAnswer) stateClass = "border-tertiary bg-tertiary-fixed/10";
-                  if (idx === userAnswer && idx !== q.correctAnswer) stateClass = "border-error bg-error-container/20";
+                  let stateClass = "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900";
+                  if (idx === q.correctAnswer) stateClass = "border-emerald-500 bg-emerald-500/10 text-emerald-950 dark:text-emerald-100";
+                  if (idx === userAnswer && idx !== q.correctAnswer) stateClass = "border-red-500 bg-red-500/10 text-red-950 dark:text-red-100";
 
                   return (
                     <div key={idx} className={cn("flex items-center gap-4 p-4 rounded-xl border-2 transition-all", stateClass)}>
                       <span className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0",
-                        idx === q.correctAnswer ? "bg-tertiary text-white" :
-                          idx === userAnswer ? "bg-error text-white" :
-                            "bg-surface-container text-on-surface-variant"
+                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 border-2",
+                        idx === q.correctAnswer ? "bg-emerald-500 text-white border-emerald-400" :
+                          idx === userAnswer ? "bg-red-500 text-white border-red-400" :
+                            "bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700"
                       )}>
                         {String.fromCharCode(65 + idx)}
                       </span>
-                      <span className="font-medium text-on-surface flex-1">{cleanText(opt)}</span>
-                      {idx === q.correctAnswer && <CheckCircle2 className="text-tertiary shrink-0" size={18} />}
-                      {idx === userAnswer && idx !== q.correctAnswer && <XCircle className="text-error shrink-0" size={18} />}
+                      <span className="font-semibold text-zinc-900 dark:text-zinc-100 flex-1">{cleanText(opt)}</span>
+                      {idx === q.correctAnswer && <CheckCircle2 className="text-emerald-500 shrink-0" size={18} />}
+                      {idx === userAnswer && idx !== q.correctAnswer && <XCircle className="text-red-500 shrink-0" size={18} />}
                     </div>
                   );
                 })}
               </div>
 
               {/* Solution & Explanation */}
-              {q.solution && (() => {
-                const enriched = enrichSolution({
-                  question: q.question,
-                  options: q.options,
-                  correctAnswer: q.correctAnswer,
-                  subject: q.subject,
-                  topic: q.topic,
-                  existingSolution: q.solution,
-                });
-                const finalSolution = enriched ? enrichedToText(enriched) : q.solution;
-                return (
-                  <div className="mb-6">
-                    <SolutionDisplay
-                      solution={finalSolution}
-                      isVisible={true}
-                      onToggle={() => {}}
-                      alwaysShow={true}
-                    />
-                  </div>
-                );
-              })()}
+              {q.solution && (
+                <div className="mb-6">
+                  <SolutionDisplay
+                    solution={q.solution}
+                    isVisible={true}
+                    onToggle={() => {}}
+                    alwaysShow={true}
+                    correctAnswer={q.correctAnswer}
+                    options={q.options}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Docked Navigation Footer */}
@@ -387,7 +377,7 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
                 handleSubmit();
               }
             }}
-            className="bg-white/20 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-white/30 transition-colors"
+            className="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all border border-white/30 cursor-pointer"
           >
             Submit Test
           </button>
@@ -425,41 +415,41 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
                   key={idx}
                   onClick={() => handleAnswer(idx)}
                   className={cn(
-                    "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all text-zinc-900 dark:text-zinc-100",
                     answers[currentQuestion] === idx
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-surface-container-high hover:border-primary/30 hover:bg-surface-container-lowest"
+                      ? "border-indigo-600 bg-indigo-500/5 shadow-sm"
+                      : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-indigo-500/50"
                   )}
                 >
                   <div className={cn(
                     "w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                    answers[currentQuestion] === idx ? "border-primary bg-primary" : "border-on-surface-variant"
+                    answers[currentQuestion] === idx ? "border-indigo-600 bg-indigo-600" : "border-zinc-400"
                   )}>
                     {answers[currentQuestion] === idx && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
                   </div>
-                  <span className="font-medium text-on-surface">{cleanText(opt)}</span>
+                  <span className="font-semibold text-sm">{cleanText(opt)}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Fixed Bottom Footer */}
-          <div className="shrink-0 p-4 border-t border-surface-container flex items-center justify-between bg-surface-container-lowest">
+          <div className="shrink-0 p-4 border-t border-zinc-200 dark:border-zinc-800/85 flex items-center justify-between bg-white dark:bg-[#0c0c22]">
             <div className="flex gap-3">
               <button
                 onClick={handleMarkReview}
                 className={cn(
-                  "px-5 py-2 rounded-lg text-sm font-bold transition-colors",
+                  "px-5 py-2.5 rounded-xl text-xs font-bold transition-colors border cursor-pointer",
                   markedForReview[currentQuestion]
-                    ? "bg-secondary-container text-on-secondary-container"
-                    : "border border-surface-container-high text-on-surface-variant hover:bg-surface-container"
+                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/40"
+                    : "border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 )}
               >
                 {markedForReview[currentQuestion] ? '✓ Marked' : 'Mark for Review'}
               </button>
               <button
                 onClick={handleClear}
-                className="px-5 py-2 border border-surface-container-high text-on-surface-variant rounded-lg text-sm font-bold hover:bg-surface-container transition-colors"
+                className="px-5 py-2.5 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
               >
                 Clear
               </button>
@@ -468,16 +458,16 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
               <button
                 onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
                 disabled={currentQuestion === 0}
-                className="px-4 py-2 bg-surface-container text-on-surface rounded-lg font-bold disabled:opacity-40 flex items-center gap-1"
+                className="px-4 py-2.5 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 rounded-xl text-xs font-bold disabled:opacity-40 flex items-center gap-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 cursor-pointer"
               >
-                <ChevronLeft size={16} /> Prev
+                <ChevronLeft size={14} /> Prev
               </button>
               <button
                 onClick={() => setCurrentQuestion(prev => Math.min(questions.length - 1, prev + 1))}
                 disabled={currentQuestion === questions.length - 1}
-                className="px-5 py-2 bg-primary text-white rounded-lg font-bold disabled:opacity-40 flex items-center gap-1 hover:bg-primary-container"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-700 rounded-xl text-xs font-bold disabled:opacity-40 flex items-center gap-1 cursor-pointer"
               >
-                Next <ChevronRight size={16} />
+                Next <ChevronRight size={14} />
               </button>
             </div>
           </div>

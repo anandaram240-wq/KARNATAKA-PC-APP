@@ -481,7 +481,7 @@ function MainApp() {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0c0c22] border-t border-white/5 z-50 flex items-center justify-around pb-safe">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0c0c22] border-t border-white/5 z-40 flex items-center justify-around pb-safe">
         {[
           { id: 'dashboard', label: lang === 'kn' ? 'ಮುಖಪುಟ' : 'Home', icon: LayoutGrid },
           { id: 'practice', label: lang === 'kn' ? 'ಅಭ್ಯಾಸ' : 'Practice', icon: BookOpen },

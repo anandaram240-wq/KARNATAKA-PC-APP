@@ -112,10 +112,10 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen, user, onLo
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "w-full flex items-center gap-3 px-6 py-3 rounded-xl ml-2 transition-all duration-200 font-bold text-sm hover:translate-x-1 cursor-pointer border-none",
+                  "w-full flex items-center gap-3 px-6 py-3 rounded-xl ml-2 transition-all duration-200 font-bold text-sm hover:translate-x-1 cursor-pointer border",
                   isActive
-                    ? "bg-primary/10 text-primary border-l-4 border-primary shadow-sm"
-                    : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+                    ? "bg-primary/10 text-primary border-primary shadow-sm"
+                    : "border-zinc-200 dark:border-zinc-800 text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
                 )}
               >
                 <item.icon size={18} className={isActive ? "text-primary" : "text-on-surface-variant"} />
@@ -199,7 +199,7 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen, user, onLo
           <div className="space-y-1 mt-2">
             <button 
               onClick={onLogout}
-              className="w-full flex items-center justify-center gap-3 px-6 py-2 text-on-surface-variant hover:text-error text-sm font-bold transition-colors"
+              className="w-full flex items-center justify-center gap-3 px-6 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-on-surface-variant hover:text-error hover:border-error/30 text-sm font-bold transition-all"
             >
               <LogOut size={18} />
               {translateUI('signOut', lang)}

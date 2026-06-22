@@ -16,7 +16,7 @@ declare global {
 
 const CLIENT_ID =
   (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
-  '323884124313-at8muqdl5varliqhndj5cn914i19j6no.apps.googleusercontent.com';
+  '473495647397-e1nkceovovamoud7bdfgk2jkg273ma6g.apps.googleusercontent.com';
 
 // ── Global GSI readiness tracker ──────────────────────────────────────────────
 if (typeof window !== 'undefined') {
@@ -155,7 +155,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           display:flex; align-items:center; justify-content:center; gap:10px;
           width:100%; padding:14px 24px;
           background:linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
-          border:1.5px solid rgba(165,180,252,.25);
+          border:2px solid #6366f1;
           border-radius:14px; color:#c7d2fe; font-size:15px; font-weight:700;
           cursor:pointer; transition:all .25s cubic-bezier(0.4, 0, 0.2, 1); font-family:inherit;
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
@@ -163,7 +163,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         }
         .guest-btn:hover{
           background:linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(139,92,246,0.15) 100%);
-          border-color:rgba(165,180,252,.5);
+          border-color:#818cf8;
           color:#fff;
           transform:translateY(-2px);
           box-shadow: 0 6px 20px rgba(99,102,241,0.25);

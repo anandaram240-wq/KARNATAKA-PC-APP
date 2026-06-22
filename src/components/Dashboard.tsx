@@ -243,7 +243,7 @@ export function Dashboard({ userName, onNavigateTo }: DashboardProps) {
                 placeholder={translateUI('addGoalPlaceholder', lang)}
                 className="flex-1 text-xs px-3 py-2 bg-surface-container-low border border-black/10 dark:border-white/5 rounded-xl focus:outline-none focus:ring-1 focus:ring-secondary/40 focus:border-secondary/40 text-on-surface placeholder:text-on-surface-variant/40"
               />
-              <button type="submit" className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 hover:opacity-90 transition bg-secondary shadow-md shadow-secondary/20 border-none">
+              <button type="submit" className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 hover:opacity-90 transition bg-secondary shadow-md shadow-secondary/20 border border-secondary">
                 <Plus size={16} />
               </button>
             </form>
@@ -312,13 +312,13 @@ export function Dashboard({ userName, onNavigateTo }: DashboardProps) {
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         onClick={() => onNavigateTo?.('practice')}
-                        className="px-2.5 py-1.5 rounded-lg text-[10px] font-black text-white hover:opacity-90 transition-all active:scale-95 shadow-md bg-gradient-to-r from-blue-600 to-indigo-700 border-none cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg text-[10px] font-black text-white hover:opacity-90 transition-all active:scale-95 shadow-md bg-gradient-to-r from-blue-600 to-indigo-700 border border-blue-700 dark:border-indigo-600 cursor-pointer"
                       >
                         {translateUI('practice', lang)}
                       </button>
                       <button
                         onClick={() => onNavigateTo?.('papers')}
-                        className="px-2.5 py-1.5 rounded-lg text-[10px] font-black border border-black/10 dark:border-white/5 bg-surface-container hover:bg-surface-container-low transition-all text-on-surface active:scale-95 cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg text-[10px] font-black border border-zinc-200 dark:border-zinc-800 bg-surface-container hover:bg-surface-container-low transition-all text-on-surface active:scale-95 cursor-pointer"
                       >
                         {translateUI('mock', lang)}
                       </button>

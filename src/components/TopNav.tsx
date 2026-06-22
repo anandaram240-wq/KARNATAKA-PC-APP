@@ -49,7 +49,7 @@ export function TopNav({ activeTab, setActiveTab, setSidebarOpen, isDarkMode, se
         {/* Left */}
         <div className="flex items-center gap-2 lg:gap-6 min-w-0">
           <button
-            className="lg:hidden text-on-surface-variant p-1.5 rounded-lg hover:bg-surface-container transition-colors"
+            className="lg:hidden text-on-surface-variant p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-surface-container transition-colors"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu size={22} />
@@ -64,10 +64,10 @@ export function TopNav({ activeTab, setActiveTab, setSidebarOpen, isDarkMode, se
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'transition-colors pb-0.5',
+                  'transition-colors pb-0.5 border-b-2',
                   activeTab === tab
-                    ? 'text-primary font-bold border-b-2 border-primary'
-                    : 'text-on-surface-variant hover:text-primary'
+                    ? 'text-primary font-bold border-primary'
+                    : 'text-on-surface-variant hover:text-primary border-transparent'
                 )}
               >
                 {getTabLabel(tab)}
@@ -84,7 +84,7 @@ export function TopNav({ activeTab, setActiveTab, setSidebarOpen, isDarkMode, se
             <input
               type="text"
               placeholder={lang === 'kn' ? 'ವಿಷಯಗಳನ್ನ್ ಹುಡುಕಿ...' : 'Search topics...'}
-              className="pl-9 pr-4 py-1.5 bg-surface-container-lowest border-none rounded-full text-sm w-52 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface"
+              className="pl-9 pr-4 py-1.5 bg-surface-container-lowest border border-zinc-200 dark:border-zinc-800 rounded-full text-sm w-52 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface"
             />
           </div>
 
@@ -94,7 +94,7 @@ export function TopNav({ activeTab, setActiveTab, setSidebarOpen, isDarkMode, se
               <button
                 id="lang-switcher-btn"
                 onClick={() => setLangOpen(v => !v)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high transition-all text-sm font-semibold text-on-surface border border-surface-container-high"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high transition-all text-sm font-semibold text-on-surface border border-zinc-200 dark:border-zinc-800"
                 title="Change Language"
               >
                 {loading
@@ -106,7 +106,7 @@ export function TopNav({ activeTab, setActiveTab, setSidebarOpen, isDarkMode, se
               </button>
 
               {langOpen && (
-                <div className="absolute right-0 top-full mt-1 w-44 rounded-xl bg-surface border border-surface-container-high shadow-xl z-50 overflow-hidden">
+                <div className="absolute right-0 top-full mt-1 w-44 rounded-xl bg-surface border border-zinc-200 dark:border-zinc-800 shadow-xl z-50 overflow-hidden">
                   {LANGUAGES.map(l => (
                     <button
                       id={`lang-option-${l.code}`}
@@ -134,7 +134,7 @@ export function TopNav({ activeTab, setActiveTab, setSidebarOpen, isDarkMode, se
 
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all active:scale-95"
+            className="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg border border-zinc-200 dark:border-zinc-800 transition-all active:scale-95"
             aria-label="Toggle dark mode"
           >
             {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
