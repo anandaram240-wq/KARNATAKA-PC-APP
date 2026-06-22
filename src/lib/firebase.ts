@@ -11,13 +11,13 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyD9qJUIdatMqFafpQGlnnxmD3E7Vc6lWf4",
-  authDomain:        "rrb-group-d-mastery.firebaseapp.com",
-  projectId:         "rrb-group-d-mastery",
-  storageBucket:     "rrb-group-d-mastery.firebasestorage.app",
-  messagingSenderId: "128235072124",
-  appId:             "1:128235072124:web:87e7339518e8ee1c1ff7f9",
-  measurementId:     "G-1E16BW58WW",
+  apiKey:            "AIzaSyAsKw4a1W3S2V_8C3Cht2f7pRRe5K7ZoCo",
+  authDomain:        "kps-pc-70582.firebaseapp.com",
+  projectId:         "kps-pc-70582",
+  storageBucket:     "kps-pc-70582.firebasestorage.app",
+  messagingSenderId: "286522403445",
+  appId:             "1:286522403445:web:3d95f890524e7dd06a663c",
+  measurementId:     "G-QQ375LGX9W",
 };
 
 const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
