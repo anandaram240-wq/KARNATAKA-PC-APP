@@ -7,6 +7,7 @@ import { syncOnLogin, onSyncStatusChange, forceSyncNow, clearOtherUserData, clea
 import { syncPlannerOnLogin, forceSyncPlanner } from './lib/plannerSync';
 import pyqsData from './data/pyqs.json';
 import { LanguageProvider, useLang } from './lib/LanguageContext';
+import { cn } from './lib/utils';
 
 import { LoginScreen } from './components/LoginScreen';
 import { trackVisit, pingServer } from './lib/visitorTracker';
