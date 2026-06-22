@@ -84,43 +84,59 @@ export function Dashboard({ userName, onNavigateTo }: DashboardProps) {
   return (
     <div className="space-y-6 pb-8 text-on-surface">
 
-      {/* ── HERO BANNER ────────────────── */}
-      <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-6 lg:p-8">
-        {/* Decorative background shapes */}
-        <div className="absolute -top-10 -right-10 w-56 h-56 rounded-full opacity-20 bg-indigo-500 filter blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full opacity-15 bg-purple-500 filter blur-2xl" />
+      {/* ── REDESIGNED WELCOME HERO CARD ────────────────── */}
+      <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-b from-[#161638] to-[#0c0c22] border border-white/5 text-white p-6 lg:p-8">
+        <div className="relative flex flex-col gap-4">
+          <div>
+            <span className="text-amber-400 text-[10px] font-black uppercase tracking-widest bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+              👋 {lang === 'kn' ? 'ಸ್ವಾಗತ' : 'WELCOME BACK'}
+            </span>
+          </div>
+          
+          <h1 className="text-4xl font-extrabold tracking-tight text-white mt-1">
+            {firstName}
+          </h1>
 
-        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-amber-400 text-xs font-black uppercase tracking-widest bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
-                👋 {lang === 'kn' ? 'ಸ್ವಾಗತ' : 'WELCOME BACK'}
-              </span>
-            </div>
-            <h1 className="text-3xl font-black mb-2 tracking-tight">
-              {firstName}
-            </h1>
-            <p className="text-indigo-200 text-xs max-w-sm font-medium italic">
-              "Success is the sum of small efforts, repeated day in and day out."
+          <div className="mt-1">
+            <p className="text-zinc-400 text-xs leading-relaxed max-w-sm italic">
+              "Discipline is the bridge between goals and accomplishment."
             </p>
-            <p className="text-indigo-300 text-[10px] mt-1">— Robert Collier</p>
+            <p className="text-zinc-500 text-[10px] mt-1">— Jim Rohn</p>
           </div>
 
-          {/* Counts Stats Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
-            {[
-              { label: lang === 'kn' ? 'ಒಟ್ಟು PYQಗಳು' : 'TOTAL PYQS', value: stats.total.toLocaleString(), color: '#818cf8', icon: '📚' },
-              { label: lang === 'kn' ? 'ಸುಲಭ' : 'EASY', value: stats.easy.toLocaleString(), color: '#34d399', icon: '✅' },
-              { label: lang === 'kn' ? 'ಮಧ್ಯಮ' : 'MEDIUM', value: stats.medium.toLocaleString(), color: '#fbbf24', icon: '⚡' },
-              { label: lang === 'kn' ? 'ಕಠಿಣ' : 'HARD', value: stats.hard.toLocaleString(), color: '#f87171', icon: '🔥' },
-            ].map(s => (
-              <div key={s.label} className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-center min-w-[100px] flex flex-col justify-center items-center shadow-lg backdrop-blur-sm">
-                <span className="text-lg mb-1">{s.icon}</span>
-                <p className="text-lg font-black" style={{ color: s.color }}>{s.value}</p>
-                <p className="text-[9px] font-bold text-indigo-200 uppercase tracking-wider mt-0.5">{s.label}</p>
-              </div>
-            ))}
+          {/* Level Progress Bar */}
+          <div className="mt-2">
+            <div className="flex justify-between items-center text-xs font-bold text-zinc-400 mb-1">
+              <span className="text-amber-400 font-extrabold">Lv.4</span>
+              <span>340/500 XP</span>
+            </div>
+            <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <div className="h-full bg-amber-400 rounded-full" style={{ width: '68%' }} />
+            </div>
           </div>
+
+          {/* Badge Pills */}
+          <div className="flex flex-wrap gap-2.5 mt-2">
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-extrabold bg-[#2a1b12] border border-amber-500/20 text-amber-500">
+              🔥 4 Day Streak
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-extrabold bg-[#131235] border border-indigo-500/20 text-indigo-400">
+              ⚡ 340 XP
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── TOTAL PYQS BLOCK CARD ────────────────── */}
+      <div className="relative overflow-hidden rounded-3xl bg-[#111129] border border-white/5 p-6 shadow-lg flex justify-between items-center">
+        {/* Subtle background graphic */}
+        <div className="absolute right-6 opacity-10 text-6xl pointer-events-none select-none">
+          📚
+        </div>
+        <div className="relative">
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">TOTAL PYQs</p>
+          <p className="text-4xl font-black text-indigo-400 tracking-tight">{stats.total.toLocaleString()}</p>
+          <p className="text-xs text-zinc-400 mt-1">Available questions</p>
         </div>
       </div>
 

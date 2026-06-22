@@ -373,7 +373,7 @@ export default function PerformanceTracker({ onNavigateTo }: PerformanceTrackerP
                 stroke="#f59e0b" 
                 strokeDasharray="5 5" 
                 strokeWidth={2}
-                label={{ value: 'RRB Cutoff ~50%', position: 'insideTopRight', fontSize: 9, fill: '#f59e0b', fontWeight: 700 }} 
+                label={{ value: 'KSP PC Cutoff ~60%', position: 'insideTopRight', fontSize: 9, fill: '#f59e0b', fontWeight: 700 }} 
               />
               <Line
                 type="monotone"

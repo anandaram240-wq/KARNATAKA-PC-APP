@@ -216,9 +216,9 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
     const isCorrect = userAnswer === q.correctAnswer;
 
     return (
-      <div className="fixed inset-0 z-50 bg-surface flex flex-col">
+      <div className="fixed inset-0 z-50 bg-surface flex flex-col h-[100dvh] overflow-hidden">
         {/* Top Bar */}
-        <div className="bg-primary text-white px-6 py-3 flex justify-between items-center shadow-md">
+        <div className="bg-primary text-white px-6 py-3 flex justify-between items-center shadow-md shrink-0">
           <div className="flex items-center gap-3">
             <button onClick={() => setShowSolutions(false)} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
               <ArrowLeft size={20} />
@@ -233,72 +233,75 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
           </button>
         </div>
 
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden min-h-0">
           {/* Question Content */}
-          <div className="flex-1 flex flex-col p-6 overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-sm font-bold">Q{rQ + 1}</span>
-              {userAnswer === undefined ? (
-                <span className="px-2 py-0.5 rounded text-xs font-bold bg-surface-container text-on-surface-variant">Skipped</span>
-              ) : isCorrect ? (
-                <span className="px-2 py-0.5 rounded text-xs font-bold bg-tertiary-fixed/20 text-tertiary flex items-center gap-1"><CheckCircle2 size={12} /> Correct</span>
-              ) : (
-                <span className="px-2 py-0.5 rounded text-xs font-bold bg-error-container/30 text-error flex items-center gap-1"><XCircle size={12} /> Wrong</span>
-              )}
-              <span className="text-[10px] text-on-surface-variant font-medium">{q.subject} › {q.topic}</span>
-            </div>
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
+            {/* Scrollable Content Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
+              <div className="flex items-center gap-3">
+                <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-sm font-bold">Q{rQ + 1}</span>
+                {userAnswer === undefined ? (
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-surface-container text-on-surface-variant">Skipped</span>
+                ) : isCorrect ? (
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-tertiary-fixed/20 text-tertiary flex items-center gap-1"><CheckCircle2 size={12} /> Correct</span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded text-xs font-bold bg-error-container/30 text-error flex items-center gap-1"><XCircle size={12} /> Wrong</span>
+                )}
+                <span className="text-[10px] text-on-surface-variant font-medium">{q.subject} › {q.topic}</span>
+              </div>
 
-            <p className="text-lg font-medium text-on-surface mb-6 leading-relaxed">{cleanText(q.question)}</p>
+              <p className="text-lg font-medium text-on-surface leading-relaxed">{cleanText(q.question)}</p>
 
-            <div className="space-y-3 max-w-3xl mb-6">
-              {q.options.map((opt, idx) => {
-                let stateClass = "border-surface-container-high";
-                if (idx === q.correctAnswer) stateClass = "border-tertiary bg-tertiary-fixed/10";
-                if (idx === userAnswer && idx !== q.correctAnswer) stateClass = "border-error bg-error-container/20";
+              <div className="space-y-3 max-w-3xl">
+                {q.options.map((opt, idx) => {
+                  let stateClass = "border-surface-container-high";
+                  if (idx === q.correctAnswer) stateClass = "border-tertiary bg-tertiary-fixed/10";
+                  if (idx === userAnswer && idx !== q.correctAnswer) stateClass = "border-error bg-error-container/20";
 
+                  return (
+                    <div key={idx} className={cn("flex items-center gap-4 p-4 rounded-xl border-2 transition-all", stateClass)}>
+                      <span className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0",
+                        idx === q.correctAnswer ? "bg-tertiary text-white" :
+                          idx === userAnswer ? "bg-error text-white" :
+                            "bg-surface-container text-on-surface-variant"
+                      )}>
+                        {String.fromCharCode(65 + idx)}
+                      </span>
+                      <span className="font-medium text-on-surface flex-1">{cleanText(opt)}</span>
+                      {idx === q.correctAnswer && <CheckCircle2 className="text-tertiary shrink-0" size={18} />}
+                      {idx === userAnswer && idx !== q.correctAnswer && <XCircle className="text-error shrink-0" size={18} />}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Solution & Explanation */}
+              {q.solution && (() => {
+                const enriched = enrichSolution({
+                  question: q.question,
+                  options: q.options,
+                  correctAnswer: q.correctAnswer,
+                  subject: q.subject,
+                  topic: q.topic,
+                  existingSolution: q.solution,
+                });
+                const finalSolution = enriched ? enrichedToText(enriched) : q.solution;
                 return (
-                  <div key={idx} className={cn("flex items-center gap-4 p-4 rounded-xl border-2 transition-all", stateClass)}>
-                    <span className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0",
-                      idx === q.correctAnswer ? "bg-tertiary text-white" :
-                        idx === userAnswer ? "bg-error text-white" :
-                          "bg-surface-container text-on-surface-variant"
-                    )}>
-                      {String.fromCharCode(65 + idx)}
-                    </span>
-                    <span className="font-medium text-on-surface flex-1">{cleanText(opt)}</span>
-                    {idx === q.correctAnswer && <CheckCircle2 className="text-tertiary shrink-0" size={18} />}
-                    {idx === userAnswer && idx !== q.correctAnswer && <XCircle className="text-error shrink-0" size={18} />}
+                  <div className="mb-6">
+                    <SolutionDisplay
+                      solution={finalSolution}
+                      isVisible={true}
+                      onToggle={() => {}}
+                      alwaysShow={true}
+                    />
                   </div>
                 );
-              })}
+              })()}
             </div>
 
-            {/* Solution & Explanation */}
-            {q.solution && (() => {
-              const enriched = enrichSolution({
-                question: q.question,
-                options: q.options,
-                correctAnswer: q.correctAnswer,
-                subject: q.subject,
-                topic: q.topic,
-                existingSolution: q.solution,
-              });
-              const finalSolution = enriched ? enrichedToText(enriched) : q.solution;
-              return (
-                <div className="mb-6">
-                  <SolutionDisplay
-                    solution={finalSolution}
-                    isVisible={true}
-                    onToggle={() => {}}
-                    alwaysShow={true}
-                  />
-                </div>
-              );
-            })()}
-
-            {/* Navigation */}
-            <div className="mt-auto pt-4 flex justify-between items-center border-t border-surface-container">
+            {/* Docked Navigation Footer */}
+            <div className="shrink-0 p-4 border-t border-surface-container flex justify-between items-center bg-surface-container-lowest">
               <button
                 onClick={() => setReviewQuestion(Math.max(0, rQ - 1))}
                 disabled={rQ === 0}
@@ -363,9 +366,9 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
   const isUrgent = timeLeft < 300; // Less than 5 minutes
 
   return (
-    <div className="fixed inset-0 z-50 bg-surface flex flex-col">
+    <div className="fixed inset-0 z-50 bg-surface flex flex-col h-[100dvh] overflow-hidden">
       {/* Top Bar */}
-      <div className={cn("px-6 py-3 flex justify-between items-center shadow-md transition-colors", isUrgent ? "bg-error" : "bg-primary", "text-white")}>
+      <div className={cn("px-6 py-3 flex justify-between items-center shadow-md transition-colors shrink-0", isUrgent ? "bg-error" : "bg-primary", "text-white")}>
         <div>
           <h2 className="font-bold text-lg">{title}</h2>
           <p className="text-xs opacity-70">{subject || 'Full Mock Test'} • {questions.length} Questions</p>
@@ -392,52 +395,56 @@ export function TakeTest({ title, questions, duration, subject, onClose, onCompl
       </div>
 
       {/* Timer Progress Bar */}
-      <div className="h-1 bg-surface-container-high">
+      <div className="h-1 bg-surface-container-high shrink-0">
         <div className={cn("h-full transition-all duration-1000", isUrgent ? "bg-error" : "bg-tertiary")} style={{ width: `${timePercent}%` }}></div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Main Content */}
-        <div className="flex-1 flex flex-col p-6 overflow-y-auto">
-          <div className="flex justify-between items-center mb-6 pb-4 border-b border-surface-container">
-            <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold text-primary">Question {currentQuestion + 1}</h3>
-              <span className="text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-medium">
-                {q.subject} › {q.topic}
-              </span>
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          {/* Scrollable Question Area */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
+            <div className="flex justify-between items-center pb-4 border-b border-surface-container">
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-bold text-primary">Question {currentQuestion + 1}</h3>
+                <span className="text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-medium">
+                  {q.subject} › {q.topic}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-xs font-bold px-2 py-1 bg-tertiary-fixed/20 text-tertiary rounded">+1 Mark</span>
+                <span className="text-xs font-bold px-2 py-1 bg-error/10 text-error rounded">-0.33 Mark</span>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <span className="text-xs font-bold px-2 py-1 bg-tertiary-fixed/20 text-tertiary rounded">+1 Mark</span>
-              <span className="text-xs font-bold px-2 py-1 bg-error/10 text-error rounded">-0.33 Mark</span>
+
+            <div className="text-lg text-on-surface max-w-3xl leading-relaxed">{cleanText(q.question)}</div>
+
+            <div className="space-y-3 max-w-2xl">
+              {q.options.map((opt, idx) => (
+                <label
+                  key={idx}
+                  onClick={() => handleAnswer(idx)}
+                  className={cn(
+                    "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    answers[currentQuestion] === idx
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : "border-surface-container-high hover:border-primary/30 hover:bg-surface-container-lowest"
+                  )}
+                >
+                  <div className={cn(
+                    "w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
+                    answers[currentQuestion] === idx ? "border-primary bg-primary" : "border-on-surface-variant"
+                  )}>
+                    {answers[currentQuestion] === idx && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
+                  </div>
+                  <span className="font-medium text-on-surface">{cleanText(opt)}</span>
+                </label>
+              ))}
             </div>
           </div>
 
-          <div className="text-lg text-on-surface mb-8 max-w-3xl leading-relaxed">{cleanText(q.question)}</div>
-
-          <div className="space-y-3 max-w-2xl">
-            {q.options.map((opt, idx) => (
-              <label
-                key={idx}
-                onClick={() => handleAnswer(idx)}
-                className={cn(
-                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
-                  answers[currentQuestion] === idx
-                    ? "border-primary bg-primary/5 shadow-sm"
-                    : "border-surface-container-high hover:border-primary/30 hover:bg-surface-container-lowest"
-                )}
-              >
-                <div className={cn(
-                  "w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                  answers[currentQuestion] === idx ? "border-primary bg-primary" : "border-on-surface-variant"
-                )}>
-                  {answers[currentQuestion] === idx && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                </div>
-                <span className="font-medium text-on-surface">{cleanText(opt)}</span>
-              </label>
-            ))}
-          </div>
-
-          <div className="mt-auto pt-6 flex items-center justify-between border-t border-surface-container">
+          {/* Fixed Bottom Footer */}
+          <div className="shrink-0 p-4 border-t border-surface-container flex items-center justify-between bg-surface-container-lowest">
             <div className="flex gap-3">
               <button
                 onClick={handleMarkReview}

@@ -281,7 +281,7 @@ const TOPIC_MASTERCLASS: Record<string, {
   'Simplification (BODMAS)':{ tag:'MUST DO 🔥', trick:'BODMAS order strictly. Same level: left to right.', formula:'B-O-D-M-A-S', examNote:'DO NOT miss these — fastest correct marks available.' },
 
   // ── REASONING ───────────────────────────────────────────────────────────────
-  'Number Series':        { tag:'MUST DO 🔥', trick:'Check: L1 differences first. If not equal → L2 differences. Also try ×2,+prime,alternating.', formula:'AP: a, a+d, a+2d... | GP: a, ar, ar²...', examNote:'4–5 Qs per exam. Differences method solves 70% of RRB series questions.' },
+  'Number Series':        { tag:'MUST DO 🔥', trick:'Check: L1 differences first. If not equal → L2 differences. Also try ×2,+prime,alternating.', formula:'AP: a, a+d, a+2d... | GP: a, ar, ar²...', examNote:'4–5 Qs per exam. Differences method solves 70% of KSP series questions.' },
   'Letter Series':        { tag:'MUST DO 🔥', trick:'Write alphabet+position: A=1, B=2...Z=26. Check gap between consecutive letters.', formula:'A=1, B=2...Z=26 | Reverse: A=26, Z=1', examNote:'Similar to Number Series but with letters. Also check alternating pattern.' },
   'Analogy':              { tag:'MUST DO 🔥', trick:'Find the relationship TYPE first (position, +gap, category, synonym). Apply same to new pair.', formula:'A:B :: C:? → same relationship', examNote:'3 Qs per shift usually. Can be word, number, or letter analogy.' },
   'Coding-Decoding':      { tag:'MUST DO 🔥', trick:'Common-word method: find word appearing in 2 sentences → its code = common symbol.', formula:'Word↔Code mapping | Letter shift: +k or −k', examNote:'Find shared word across sentences for direct code. 2–3 Qs per exam.' },

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, lazy, Suspense, Component, ErrorInf
 import localforage from 'localforage';
 import { Sidebar } from './components/Sidebar';
 import { TopNav } from './components/TopNav';
+import { LayoutGrid, BookOpen, Timer, Compass, BarChart3 } from 'lucide-react';
 import { syncOnLogin, onSyncStatusChange, forceSyncNow, clearOtherUserData, clearCurrentUserData, type SyncStatus } from './lib/performanceEngine';
 import { syncPlannerOnLogin, forceSyncPlanner } from './lib/plannerSync';
 import pyqsData from './data/pyqs.json';
@@ -78,7 +79,8 @@ class TabErrorBoundary extends Component<{ children: ReactNode }, { hasError: bo
   }
 }
 
-export default function App() {
+function MainApp() {
+  const { lang } = useLang();
   const [activeTab, setActiveTab] = useState(getInitialTab);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -305,7 +307,6 @@ export default function App() {
   );
 
   return (
-    <LanguageProvider>
     <div className="min-h-screen bg-surface text-on-surface font-sans antialiased flex transition-colors duration-300">
 
       {/* ── Cloud Sync Banner ─────────────────────────────── */}
@@ -451,7 +452,7 @@ export default function App() {
       />
       <div className="flex-1 flex flex-col w-full lg:ml-64 min-w-0">
         <TopNav activeTab={activeTab} setActiveTab={setActiveTabWithURL} setSidebarOpen={setSidebarOpen} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} user={user} showLangSwitcher={true} />
-        <main className="pt-16 px-3 sm:px-4 lg:px-8 pb-12 w-full min-w-0 overflow-x-hidden">
+        <main className="pt-16 px-3 sm:px-4 lg:px-8 pb-20 lg:pb-12 w-full min-w-0 overflow-x-hidden">
           <div className="max-w-screen-xl mx-auto">
             <Suspense fallback={<TabSpinner />}>
               <TabErrorBoundary>
@@ -470,7 +471,50 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0c0c22] border-t border-white/5 z-50 flex items-center justify-around pb-safe">
+        {[
+          { id: 'dashboard', label: lang === 'kn' ? 'ಮುಖಪುಟ' : 'Home', icon: LayoutGrid },
+          { id: 'practice', label: lang === 'kn' ? 'ಅಭ್ಯಾಸ' : 'Practice', icon: BookOpen },
+          { id: 'papers', label: lang === 'kn' ? 'ಪರೀಕ್ಷೆ' : 'Mock', icon: Timer },
+          { id: 'roadmap', label: lang === 'kn' ? 'ರೋಡ್‌ಮ್ಯಾಪ್' : 'Roadmap', icon: Compass },
+          { id: 'analytics', label: lang === 'kn' ? 'ವಿಶ್ಲೇಷಣೆ' : 'Stats', icon: BarChart3 },
+        ].map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTabWithURL(tab.id)}
+              className="flex flex-col items-center justify-center w-16 h-full bg-transparent border-none cursor-pointer focus:outline-none"
+            >
+              <div className={cn(
+                "p-1 px-3.5 rounded-xl transition-all",
+                isActive 
+                  ? "bg-[#131235] text-indigo-400 border border-indigo-500/25" 
+                  : "text-zinc-400"
+              )}>
+                <Icon size={20} />
+              </div>
+              <span className={cn(
+                "text-[9px] font-bold mt-1 tracking-tight",
+                isActive ? "text-indigo-400" : "text-zinc-500"
+              )}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <MainApp />
     </LanguageProvider>
   );
 }

@@ -189,7 +189,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           </div>
           <div className="lbadge" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(99,102,241,.15)', border: '1px solid rgba(99,102,241,.3)', borderRadius: 99, padding: '4px 14px' }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399' }} />
-            <span style={{ color: '#a5b4fc', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>RRB GROUP D MASTERY</span>
+            <span style={{ color: '#a5b4fc', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>KSP PC MASTERY</span>
           </div>
         </div>
 
@@ -198,12 +198,12 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           <h1 style={{ color: '#fff', fontSize: 30, fontWeight: 900, letterSpacing: -.5, margin: 0, lineHeight: 1.15 }}>
             Welcome to{' '}
             <span style={{ background: 'linear-gradient(90deg,#818cf8,#c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              RRB Group D
+              KSP PC
             </span>
           </h1>
         </div>
         <div className="la3" style={{ marginBottom: 28 }}>
-          <p style={{ color: 'rgba(165,180,252,.6)', fontSize: 13, margin: 0 }}>5,699 PYQs · Real solutions · Track progress</p>
+          <p style={{ color: 'rgba(165,180,252,.6)', fontSize: 13, margin: 0 }}>5,799 PYQs · Real solutions · Track progress</p>
         </div>
 
         {/* Card */}
@@ -274,7 +274,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         {/* Stats row */}
         <div className="la5" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
           {[
-            { v: '5,699', l: 'Total PYQs' },
+            { v: '5,799', l: 'Total PYQs' },
             { v: '4 Subjects', l: 'Full Syllabus' },
             { v: '60+ Topics', l: 'Classified' },
           ].map(s => (
