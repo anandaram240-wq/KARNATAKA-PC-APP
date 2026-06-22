@@ -487,7 +487,7 @@ function QDifficulty({ items }: { items:AdminDashboardData['globalStats']['quest
 }
 
 // ─── Cmd+K Palette ────────────────────────────────────────────────────────────
-type TabId='overview'|'users'|'traffic'|'questions'|'broadcast'|'live';
+type TabId='overview'|'users'|'leaderboard'|'traffic'|'questions'|'broadcast'|'live';
 
 function CommandPalette({ open,onClose,users,onTab,onRefresh }:{
   open:boolean; onClose:()=>void; users:AdminUser[];
@@ -498,13 +498,14 @@ function CommandPalette({ open,onClose,users,onTab,onRefresh }:{
   useEffect(()=>{ if(open){setQ('');setTimeout(()=>inp.current?.focus(),50);} },[open]);
   if(!open) return null;
   const cmds=[
-    {icon:'◈',label:'Overview',   act:()=>{onTab('overview');onClose();}},
-    {icon:'⊙',label:'Users',      act:()=>{onTab('users');onClose();}},
-    {icon:'↗',label:'Traffic',    act:()=>{onTab('traffic');onClose();}},
-    {icon:'✦',label:'Questions',  act:()=>{onTab('questions');onClose();}},
-    {icon:'↯',label:'Broadcast',  act:()=>{onTab('broadcast');onClose();}},
-    {icon:'●',label:'Live Feed',  act:()=>{onTab('live');onClose();}},
-    {icon:'↺',label:'Refresh',    act:()=>{onRefresh();onClose();}},
+    {icon:'◈',label:'Overview',     act:()=>{onTab('overview');onClose();}},
+    {icon:'⊙',label:'Users',        act:()=>{onTab('users');onClose();}},
+    {icon:'🏆',label:'Leaderboard', act:()=>{onTab('leaderboard');onClose();}},
+    {icon:'↗',label:'Traffic',      act:()=>{onTab('traffic');onClose();}},
+    {icon:'✦',label:'Questions',    act:()=>{onTab('questions');onClose();}},
+    {icon:'↯',label:'Broadcast',    act:()=>{onTab('broadcast');onClose();}},
+    {icon:'●',label:'Live Feed',    act:()=>{onTab('live');onClose();}},
+    {icon:'↺',label:'Refresh',      act:()=>{onRefresh();onClose();}},
   ];
   const mu=q.length>1?users.filter(u=>u.name.toLowerCase().includes(q.toLowerCase())||u.email.toLowerCase().includes(q.toLowerCase())).slice(0,5):[];
   const mc=cmds.filter(c=>!q||c.label.toLowerCase().includes(q.toLowerCase()));
@@ -657,6 +658,7 @@ export function AdminPanel({ userEmail }: { userEmail:string }) {
   const TABS:[TabId,string,string][]=[
     ['overview','◈','Overview'],
     ['users','⊙','Users'],
+    ['leaderboard','🏆','Leaderboard'],
     ['traffic','↗','Traffic'],
     ['questions','✦','Questions'],
     ['broadcast','↯','Broadcast'],
@@ -1102,6 +1104,133 @@ export function AdminPanel({ userEmail }: { userEmail:string }) {
                 </table>
               </div>
             )}
+          </Box>
+        </div>
+      )}
+
+      {/* ═══ LEADERBOARD ═══ */}
+      {tab==='leaderboard'&&(
+        <div className="as">
+          {/* Summary hero row */}
+          <div style={{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap' as const}}>
+            <HeroStat label="Total Users" value={fmt(data!.users.length)} color={T.purple}/>
+            <HeroStat label="Active (7 Days)" value={fmt(gs.segments.active + gs.segments.new)} color={T.green}/>
+            <HeroStat label="Total Questions Solved" value={fmt(gs.totalQsSolved)} color={T.amber}/>
+            <HeroStat label="Avg Accuracy" value={`${gs.avgAccuracy}%`} color={T.teal}/>
+          </div>
+
+          {/* Leaderboard tabs */}
+          {(() => {
+            const lbTabs: {key: 'qs'|'acc'|'eng'; label: string; icon: string; color: string}[] = [
+              {key:'qs',  label:'Most Questions', icon:'📝', color:T.purple},
+              {key:'acc', label:'Best Accuracy',  icon:'🎯', color:T.green},
+              {key:'eng', label:'Top Engaged',    icon:'⚡', color:T.amber},
+            ];
+            return (
+              <div style={{display:'flex',gap:7,marginBottom:14,flexWrap:'wrap' as const}}>
+                {lbTabs.map(t=>(
+                  <button key={t.key} onClick={()=>setSortBy(t.key)}
+                    style={{padding:'7px 15px',borderRadius:99,border:`1px solid ${sortBy===t.key?t.color:T.border}`,
+                      background:sortBy===t.key?`${t.color}18`:'transparent',
+                      color:sortBy===t.key?t.color:T.muted,fontSize:12,fontWeight:600,cursor:'pointer',transition:'all 0.15s'}}>
+                    {t.icon} {t.label}
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
+
+          <Box title={`🏆 Leaderboard — ${sortBy==='qs'?'Most Questions Solved':sortBy==='acc'?'Best Accuracy':'Top Engaged'}`}
+            right={<span style={{fontSize:11,color:T.muted}}>{data!.users.length} students</span>}>
+            {data!.users.length===0?(
+              <div style={{textAlign:'center',color:T.dim,padding:48,fontSize:13}}>
+                <div style={{fontSize:40,marginBottom:10}}>🏆</div>
+                <div style={{fontWeight:600}}>No students yet</div>
+                <div style={{fontSize:12,marginTop:4}}>Users appear here after they sign in with Google and practice</div>
+              </div>
+            ):(
+              <div>
+                {/* Header */}
+                <div style={{display:'grid',gridTemplateColumns:'44px 1fr 90px 90px 90px 70px',gap:8,padding:'8px 12px',borderBottom:`1px solid ${T.border}`,fontSize:10,fontWeight:700,color:T.muted,letterSpacing:'0.06em',textTransform:'uppercase' as const}}>
+                  <span>Rank</span><span>Student</span><span style={{textAlign:'right'}}>Questions</span><span style={{textAlign:'right'}}>Accuracy</span><span style={{textAlign:'right'}}>Tests</span><span style={{textAlign:'center'}}>Status</span>
+                </div>
+                {[...data!.users]
+                  .sort((a,b)=>
+                    sortBy==='qs'?b.totalQuestions-a.totalQuestions:
+                    sortBy==='acc'?b.accuracy-a.accuracy:
+                    b.engagementScore-a.engagementScore
+                  )
+                  .map((u,i)=>{
+                    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':null;
+                    const rankColor = i===0?T.amber:i===1?'#9ca3af':i===2?'#cd7c2f':T.muted;
+                    const isTop3 = i<3;
+                    return (
+                      <div key={u.docId} style={{
+                        display:'grid',gridTemplateColumns:'44px 1fr 90px 90px 90px 70px',gap:8,
+                        padding:'11px 12px',borderBottom:`1px solid ${T.border}`,
+                        alignItems:'center',
+                        background:isTop3?`rgba(124,92,252,${0.04*(3-i)})`:'transparent',
+                        transition:'background 0.15s',
+                      }}>
+                        {/* Rank */}
+                        <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
+                          {medal
+                            ? <span style={{fontSize:20}}>{medal}</span>
+                            : <span style={{fontSize:13,fontWeight:700,color:rankColor,fontVariantNumeric:'tabular-nums'}}>{i+1}</span>
+                          }
+                        </div>
+                        {/* Name + email */}
+                        <div style={{display:'flex',alignItems:'center',gap:9,minWidth:0}}>
+                          <img src={u.avatar} alt={u.name}
+                            style={{width:34,height:34,borderRadius:'50%',flexShrink:0,border:`2px solid ${isTop3?T.purple+'55':T.border}`}}
+                            onError={e=>{(e.target as any).src=`https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=7c5cfc&color=fff`;}} />
+                          <div style={{minWidth:0}}>
+                            <div style={{fontSize:13,fontWeight:isTop3?700:600,color:T.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{u.name}</div>
+                            <div style={{fontSize:10,color:T.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{u.email}</div>
+                          </div>
+                        </div>
+                        {/* Questions */}
+                        <div style={{textAlign:'right'}}>
+                          <div style={{fontSize:15,fontWeight:700,color:T.purple,fontVariantNumeric:'tabular-nums'}}>{fmt(u.totalQuestions)}</div>
+                          <div style={{fontSize:9,color:T.dim}}>{u.totalCorrect} correct</div>
+                        </div>
+                        {/* Accuracy */}
+                        <div style={{textAlign:'right'}}>
+                          <div style={{fontSize:15,fontWeight:700,color:u.accuracy>=70?T.green:u.accuracy>=40?T.amber:T.red,fontVariantNumeric:'tabular-nums'}}>{u.accuracy}%</div>
+                          <div style={{height:3,background:T.dim,borderRadius:2,marginTop:4}}>
+                            <div style={{height:'100%',width:`${u.accuracy}%`,background:u.accuracy>=70?T.green:u.accuracy>=40?T.amber:T.red,borderRadius:2}}/>
+                          </div>
+                        </div>
+                        {/* Tests */}
+                        <div style={{textAlign:'right',fontSize:13,color:T.muted,fontVariantNumeric:'tabular-nums'}}>
+                          {u.totalTests} tests
+                        </div>
+                        {/* Status */}
+                        <div style={{display:'flex',justifyContent:'center'}}>
+                          <SegBadge seg={u.segment}/>
+                        </div>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+            )}
+          </Box>
+
+          {/* Subject accuracy breakdown */}
+          <Box title="📊 Subject-wise Class Performance"
+            right={<span style={{fontSize:11,color:T.muted}}>Average across all users</span>}>
+            {gs.contentPerformance.map(r=>(
+              <div key={r.subject} style={{marginBottom:14}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:5}}>
+                  <span style={{color:T.text,fontWeight:600}}>{r.subject}</span>
+                  <span style={{color:r.avgAccuracy>=70?T.green:r.avgAccuracy>=40?T.amber:T.red,fontWeight:700}}>{r.avgAccuracy||'—'}%</span>
+                </div>
+                <div style={{height:6,background:T.dim,borderRadius:3}}>
+                  <div style={{height:'100%',width:`${r.avgAccuracy}%`,background:r.avgAccuracy>=70?T.green:r.avgAccuracy>=40?T.amber:T.red,borderRadius:3,transition:'width 0.8s ease'}}/>
+                </div>
+              </div>
+            ))}
           </Box>
         </div>
       )}

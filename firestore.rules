@@ -2,12 +2,18 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Each user: read/write their own document only ────────────────────────
+    // ── Helper: is the request from the admin account? ────────────────────────
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.token.email == 'anandakiccha240@gmail.com';
+    }
+
+    // ── Each user: read/write their own document; admin reads all ─────────────
     match /users/{userId} {
       allow read: if request.auth != null && (
         request.auth.uid == userId ||
         (resource != null && request.auth.token.email == resource.data.email) ||
-        request.auth.token.email == 'anandakiccha240@gmail.com'
+        isAdmin()
       );
       allow write: if request.auth != null && (
         request.auth.uid == userId ||
@@ -16,31 +22,63 @@ service cloud.firestore {
       );
     }
 
-    // ── Broadcasts: admin writes, any authenticated user reads ───────────────
+    // ── Visitors: written by trackVisit(), admin reads all ───────────────────
+    match /visitors/{docId} {
+      allow read: if isAdmin();
+      allow create, update: if request.auth != null;
+    }
+
+    // ── Analytics sessions: server writes, admin reads ───────────────────────
+    match /analytics/{docId} {
+      allow read: if isAdmin();
+      allow write: if false; // server-side only
+    }
+
+    // ── Daily analytics: server writes, admin reads ───────────────────────────
+    match /analytics_daily/{docId} {
+      allow read: if isAdmin();
+      allow write: if false; // server-side only
+    }
+
+    // ── Admin stats (global counters) ─────────────────────────────────────────
+    match /admin_stats/{docId} {
+      allow read: if isAdmin();
+      allow write: if request.auth != null; // trackVisit writes here
+    }
+
+    // ── Math/AI solutions: admin reads all ────────────────────────────────────
+    match /math_solutions/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // ── Broadcasts: admin writes, any authenticated user reads ────────────────
     match /broadcasts/{docId} {
       allow read: if request.auth != null;
-      allow create, update: if request.auth != null
-        && request.auth.token.email == 'anandakiccha240@gmail.com';
+      allow create, update: if isAdmin();
     }
 
     // ── Admin logs: admin only ────────────────────────────────────────────────
     match /adminLogs/{logId} {
-      allow read, write: if request.auth != null
-        && request.auth.token.email == 'anandakiccha240@gmail.com';
+      allow read, write: if isAdmin();
     }
 
     // ── FCM tokens: user writes own, admin reads all ──────────────────────────
     match /fcmTokens/{userId} {
       allow write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null
-        && request.auth.token.email == 'anandakiccha240@gmail.com';
+      allow read: if isAdmin();
     }
 
     // ── Content flags: any user can create, admin reads/updates ──────────────
     match /contentFlags/{flagId} {
       allow create: if request.auth != null;
-      allow read, update: if request.auth != null
-        && request.auth.token.email == 'anandakiccha240@gmail.com';
+      allow read, update: if isAdmin();
+    }
+
+    // ── Leaderboard: any logged-in user reads, server writes ─────────────────
+    match /leaderboard/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null; // users update own entry
     }
 
     // ── Deny everything else ──────────────────────────────────────────────────
