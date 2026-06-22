@@ -16,7 +16,7 @@ declare global {
 
 const CLIENT_ID =
   (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
-  '286522403445-se5lbgo3himsb2tio2lrpt1lq10963lv.apps.googleusercontent.com';
+  '473495647397-e1nkceovovamoud7bdfgk2jkg273ma6g.apps.googleusercontent.com';
 
 
 // ── Global GSI readiness tracker ──────────────────────────────────────────────
