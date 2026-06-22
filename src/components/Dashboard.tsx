@@ -22,7 +22,7 @@ const SUBJECT_CONFIG = {
 export function Dashboard({ userName, onNavigateTo }: DashboardProps) {
   const { lang } = useLang();
   const allQuestions = pyqsData as PYQ[];
-  const firstName = userName.split(' ')[0];
+  const firstName = (userName || 'Guest').split(' ')[0];
 
   // Modal states
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

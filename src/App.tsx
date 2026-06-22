@@ -132,7 +132,14 @@ function MainApp() {
 
   const [user, setUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('rrb_user');
-    if (saved) try { return JSON.parse(saved); } catch { return null; }
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') return parsed;
+      } catch {
+        return null;
+      }
+    }
     return null;
   });
 
