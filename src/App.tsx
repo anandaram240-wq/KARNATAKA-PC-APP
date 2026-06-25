@@ -91,7 +91,7 @@ function App() {
           avatar: firebaseUser.photoURL    || '',
         };
         setUser(profile);
-        trackVisit(profile.name, profile.email, false).catch(() => {});
+        trackVisit(profile.email, profile.name, 'google').catch(() => {});
       } else {
         setUser(null);
       }
@@ -102,7 +102,8 @@ function App() {
 
   const handleLogin = (profile: UserProfile) => {
     setUser(profile);
-    trackVisit(profile.name, profile.email, profile.email === 'guest@local').catch(() => {});
+    const loginType = profile.email === 'guest@local' ? 'guest' : 'google';
+    trackVisit(profile.email, profile.name, loginType).catch(() => {});
   };
 
   const handleLogout = async () => {
@@ -114,6 +115,7 @@ function App() {
   // Loading
   if (!authReady) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', background: 'var(--c-surface)' }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <Spinner />
     </div>
   );
