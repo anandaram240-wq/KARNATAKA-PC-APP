@@ -4,6 +4,8 @@ import { auth } from '../lib/firebase';
 
 interface LoginScreenProps {
   onLogin: (profile: { name: string; email: string; avatar: string }) => void;
+  isDark?: boolean;
+  onToggleDark?: () => void;
 }
 
 declare global {
@@ -47,7 +49,7 @@ function whenGoogleReady(fn: () => void) {
   }
 }
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleReady, setGoogleReady] = useState(false);
