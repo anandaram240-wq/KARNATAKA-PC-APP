@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: 'prompt',
+        registerType: 'autoUpdate',
         includeAssets: ['icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'favicon-32.png'],
         manifest: {
           name: 'KSP Master Pro',
@@ -50,6 +50,8 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          skipWaiting: true,
+          clientsClaim: true,
           // Allow large bundles (pyqs.json is embedded in JS)
           maximumFileSizeToCacheInBytes: 15 * 1024 * 1024, // 15 MB
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
