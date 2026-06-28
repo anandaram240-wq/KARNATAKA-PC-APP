@@ -1,4 +1,4 @@
-// src/App.tsx — With login, LangContext, exam date, offline banner, full bilingual
+// src/App.tsx — Final: Login, LangContext, Profile/Logout, Admin gated to anandakiccha240@gmail.com
 import React, { useState, useCallback, useEffect } from 'react';
 import { LangContext } from './lib/LangContext';
 import { t } from './lib/i18n';
@@ -9,9 +9,9 @@ import Home from './components/Home';
 import PracticeView from './components/PracticeView';
 import MockTestView from './components/MockTestView';
 import InsightsView from './components/InsightsView';
-import ProgressView from './components/ProgressView';
+import ProfileView from './components/ProfileView';
 
-type Tab = 'home' | 'practice' | 'test' | 'insights' | 'progress';
+type Tab = 'home' | 'practice' | 'test' | 'insights' | 'profile';
 
 interface NavState {
   tab: Tab;
@@ -20,22 +20,18 @@ interface NavState {
   insightsInitialSection?: string;
 }
 
-interface UserProfile {
-  name: string;
-  email: string;
-  avatar: string;
-}
-
+interface UserProfile { name: string; email: string; avatar: string; }
 const PROFILE_KEY = 'ksp_user_profile';
 
 function loadProfile(): UserProfile | null {
-  try {
-    const s = localStorage.getItem(PROFILE_KEY);
-    return s ? JSON.parse(s) : null;
-  } catch { return null; }
+  try { const s = localStorage.getItem(PROFILE_KEY); return s ? JSON.parse(s) : null; }
+  catch { return null; }
 }
 function saveProfile(p: UserProfile) {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+}
+function clearProfile() {
+  localStorage.removeItem(PROFILE_KEY);
 }
 
 export default function App() {
@@ -43,7 +39,7 @@ export default function App() {
   const [lang,    setLangState] = useState<'en' | 'kn'>(() => getLang());
   const [nav,     setNav]       = useState<NavState>({ tab: 'home' });
   const [online,  setOnline]    = useState(navigator.onLine);
-  const [profile, setProfile]   = useState<UserProfile | null>(() => loadProfile());
+  const [profile, setProfile]   = useState<UserProfile | null>(loadProfile);
   const [langAnim, setLangAnim] = useState(false);
 
   // Dark mode
@@ -89,8 +85,9 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem(PROFILE_KEY);
+    clearProfile();
     setProfile(null);
+    setNav({ tab: 'home' });
   };
 
   // ── Show Login if no profile ──────────────────────────
@@ -111,7 +108,7 @@ export default function App() {
     <LangContext.Provider value={lang}>
       <div className="app-shell">
 
-        {/* Offline banner */}
+        {/* ── Offline banner ── */}
         {!online && (
           <div className="offline-banner">
             <span>📵</span>
@@ -119,7 +116,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Global controls: lang + dark */}
+        {/* ── Global controls ── */}
         <div style={{
           position: 'fixed',
           top: online ? 10 : 38,
@@ -130,7 +127,7 @@ export default function App() {
           alignItems: 'center',
           transition: 'top 0.2s ease',
         }}>
-          <button className="lang-toggle" onClick={toggleLang} title="Toggle language">
+          <button className="lang-toggle" onClick={toggleLang} title="Switch language">
             <span className="lang-dot" />
             <span className={langAnim ? 'lang-enter' : ''}>
               {lang === 'en' ? 'ಕನ್ನಡ' : 'English'}
@@ -139,13 +136,10 @@ export default function App() {
           <button
             onClick={toggleDark}
             style={{
-              background: 'var(--c-surface-2)',
-              border: '1.5px solid var(--c-border)',
-              borderRadius: '50%',
-              width: 34, height: 34,
+              background: 'var(--c-surface-2)', border: '1.5px solid var(--c-border)',
+              borderRadius: '50%', width: 34, height: 34,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: 16,
-              transition: 'var(--t-base)',
+              cursor: 'pointer', fontSize: 16, transition: 'var(--t-base)',
               boxShadow: 'var(--shadow-xs)',
             }}
             title="Toggle dark mode"
@@ -154,11 +148,11 @@ export default function App() {
           </button>
         </div>
 
-        {/* Main content */}
+        {/* ── Main Content ── */}
         <main className="main-content">
           {nav.tab === 'home' && (
             <div className="page-enter">
-              <Home lang={lang} onNavigate={(tab, extra) => navigate(tab, extra)} />
+              <Home lang={lang} onNavigate={(tab, extra) => navigate(tab as Tab, extra)} />
             </div>
           )}
           {nav.tab === 'practice' && (
@@ -188,9 +182,9 @@ export default function App() {
               />
             </div>
           )}
-          {nav.tab === 'progress' && (
+          {nav.tab === 'profile' && (
             <div className="page-enter">
-              <ProgressView />
+              <ProfileView onLogout={handleLogout} />
             </div>
           )}
         </main>

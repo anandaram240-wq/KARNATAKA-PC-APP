@@ -8,6 +8,7 @@ const T = {
   nav_test:      { en: 'Test',     kn: 'ಪರೀಕ್ಷೆ' },
   nav_insights:  { en: 'Insights', kn: 'ವಿಶ್ಲೇಷಣೆ' },
   nav_progress:  { en: 'Progress', kn: 'ಪ್ರಗತಿ' },
+  nav_profile:   { en: 'Profile',  kn: 'ಖಾತೆ' },
 
   // ── Login ────────────────────────────────────────────
   login_title:   { en: 'KSP Tayyari', kn: 'ಕೆಎಸ್ಪಿ ತಯಾರಿ' },
