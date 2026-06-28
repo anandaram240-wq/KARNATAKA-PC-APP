@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useT } from '../lib/i18n';
 import { getOverallStats, getAllTests, getStreak, getSettings, saveSettings } from '../lib/storage';
 import { getLatestCutoff, getCutoffTrend } from '../lib/cutoffEngine';
+import { getPhysicalRequirements } from '../lib/physicalData';
 import type { UserSettings } from '../lib/storage';
 
 interface UserProfile { name: string; email: string; avatar: string; }
@@ -199,6 +200,7 @@ export default function ProfileView({ onLogout }: Props) {
 
   const cutoffInfo = useMemo(() => getLatestCutoff({ category: cat, region, gender }), [cat, region, gender]);
   const trend      = useMemo(() => getCutoffTrend({ category: cat, region, gender }),  [cat, region, gender]);
+  const physReqs   = useMemo(() => getPhysicalRequirements({ category: cat, region, gender }), [cat, region, gender]);
 
   useEffect(() => {
     const handler = () => setPwaReady(true);
@@ -386,6 +388,96 @@ export default function ProfileView({ onLogout }: Props) {
               </button>
             </div>
 
+            {/* ── Physical Requirements Card ── */}
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+              {/* Header */}
+              <div style={{
+                background: 'linear-gradient(135deg,#1B5E20,#2E7D32)',
+                padding: '12px 16px',
+                display: 'flex', alignItems: 'center', gap: 10,
+              }}>
+                <span style={{ fontSize: 28 }}>🏃</span>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: '#fff' }}>Physical Requirements</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,.75)', marginTop: 2 }}>
+                    {cat.replace(/_/g,' ')} · {region} · {gender === 'M' ? 'Male' : 'Female'}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '14px 16px' }}>
+                {/* Height + Chest/Weight row */}
+                <div style={{ display: 'grid', gridTemplateColumns: gender === 'M' ? 'repeat(3,1fr)' : '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                  <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 28, lineHeight: 1, marginBottom: 4 }}>📏</div>
+                    <div style={{ fontWeight: 900, fontSize: 22, color: '#16A34A', lineHeight: 1 }}>{physReqs.heightCm}</div>
+                    <div style={{ fontSize: 10, color: '#15803D', fontWeight: 700, marginTop: 2 }}>cm HEIGHT</div>
+                  </div>
+                  {gender === 'M' && physReqs.chestNormal && (
+                    <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 28, lineHeight: 1, marginBottom: 4 }}>👕</div>
+                      <div style={{ fontWeight: 900, fontSize: 17, color: '#1565C0', lineHeight: 1 }}>
+                        {physReqs.chestNormal}–{physReqs.chestExpanded}
+                      </div>
+                      <div style={{ fontSize: 10, color: '#1D4ED8', fontWeight: 700, marginTop: 2 }}>cm CHEST</div>
+                      <div style={{ fontSize: 9, color: 'var(--c-text-3)', marginTop: 1 }}>Normal–Expanded</div>
+                    </div>
+                  )}
+                  {gender === 'F' && physReqs.weightKg && (
+                    <div style={{ background: '#FDF4FF', border: '1px solid #E9D5FF', borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 28, lineHeight: 1, marginBottom: 4 }}>⚖️</div>
+                      <div style={{ fontWeight: 900, fontSize: 22, color: '#7C3AED', lineHeight: 1 }}>{physReqs.weightKg}+</div>
+                      <div style={{ fontSize: 10, color: '#6D28D9', fontWeight: 700, marginTop: 2 }}>kg WEIGHT</div>
+                    </div>
+                  )}
+                  <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 28, lineHeight: 1, marginBottom: 4 }}>👁️</div>
+                    <div style={{ fontWeight: 700, fontSize: 11, color: '#C2410C', lineHeight: 1.4 }}>6/6 &amp; 6/9</div>
+                    <div style={{ fontSize: 10, color: '#EA580C', fontWeight: 700, marginTop: 2 }}>EYESIGHT</div>
+                    <div style={{ fontSize: 9, color: 'var(--c-text-3)', marginTop: 1 }}>No glasses</div>
+                  </div>
+                </div>
+
+                {/* PET Events */}
+                <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--c-text-3)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+                  Physical Efficiency Test (PET)
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[
+                    { icon: '🏃', label: 'Running',   val: physReqs.run },
+                    { icon: '🦘', label: 'Long Jump', val: physReqs.longJump },
+                    { icon: '⚾', label: 'Shot Put',  val: physReqs.shotPut },
+                  ].map(({ icon, label, val }) => (
+                    <div key={label} style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      background: 'var(--c-surface-2)', borderRadius: 10, padding: '10px 12px',
+                      border: '1px solid var(--c-border)',
+                    }}>
+                      <span style={{ fontSize: 22, flexShrink: 0 }}>{icon}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-text-3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-text)', marginTop: 2 }}>{val}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Notes */}
+                <div style={{ marginTop: 12 }}>
+                  {physReqs.notes.map((note, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 8, padding: '5px 0', borderTop: i === 0 ? '1px solid var(--c-border)' : 'none', marginTop: i === 0 ? 8 : 0 }}>
+                      <span style={{ color: '#D97706', fontWeight: 700, flexShrink: 0 }}>⚠</span>
+                      <div style={{ fontSize: 12, color: 'var(--c-text-2)', lineHeight: 1.5 }}>{note}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ fontSize: 11, color: 'var(--c-text-4)', marginTop: 12, padding: '8px 10px', background: 'var(--c-surface-2)', borderRadius: 8 }}>
+                  📌 Standards change per notification. Always verify from official KSP website.
+                </div>
+              </div>
+            </div>
+
             {/* App Install */}
             <div className="card" style={{ background: 'linear-gradient(135deg,#EFF6FF,#DBEAFE)', border: '1px solid #BFDBFE' }}>
               <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: '#1E3A8A' }}>📲 Install App</div>
@@ -411,6 +503,15 @@ export default function ProfileView({ onLogout }: Props) {
             <button className="btn btn-block btn-danger" onClick={() => setShowLogoutConf(true)}>
               🚪 Logout
             </button>
+
+            {/* Developer credit */}
+            <div style={{ textAlign: 'center', padding: '16px 0 4px', fontSize: 12, color: 'var(--c-text-4)', lineHeight: 1.8 }}>
+              <div style={{ fontSize: 20, marginBottom: 4 }}>🚔</div>
+              <div style={{ fontWeight: 700, color: 'var(--c-text-3)' }}>KSP Tayyari</div>
+              <div>Developed by <strong style={{ color: 'var(--c-primary)' }}>Ananda Valmiki</strong></div>
+              <div style={{ fontSize: 11, marginTop: 2 }}>2,499 PYQs · EN + ಕನ್ನಡ · Offline PWA</div>
+              <div style={{ fontSize: 10, marginTop: 4, color: 'var(--c-text-4)' }}>v2.0 · 2024–2025</div>
+            </div>
           </>
         )}
 
