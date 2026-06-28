@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.1",
@@ -49,11 +50,13 @@
     "@types/node": "^22.14.0",
     "@vercel/node": "^5.8.8",
     "autoprefixer": "^10.4.21",
+    "gh-pages": "^6.3.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "vite-plugin-pwa": "^1.2.0",
     "workbox-window": "^7.4.0"
-  }
+  },
+  "homepage": "https://anandaram240-wq.github.io/KARNATAKA-PC-APP"
 }
