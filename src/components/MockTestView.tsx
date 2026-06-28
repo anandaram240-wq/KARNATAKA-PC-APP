@@ -467,7 +467,14 @@ function ActiveTest({
   const opts  = lang === 'kn' && q.options_kn?.length ? q.options_kn : q.options;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+    <div style={{
+      display: 'flex', flexDirection: 'column',
+      height: '100dvh',
+      position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+      width: '100%', maxWidth: 540,
+      background: 'var(--c-surface)',
+      zIndex: 90,
+    }}>
       {/* Test header */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 50, background: 'var(--c-surface)',
@@ -492,7 +499,8 @@ function ActiveTest({
         </div>
       </div>
 
-      <div className="page page-gap" style={{ flex: 1 }}>
+      {/* Scrollable question area */}
+      <div className="page page-gap" style={{ flex: 1, overflowY: 'auto', paddingBottom: 16 }}>
         {/* Exam label */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           <span className="q-exam-year">{q.year}</span>
@@ -562,11 +570,15 @@ function ActiveTest({
         )}
       </div>
 
-      {/* Footer */}
+      {/* Fixed bottom footer — zero fluctuation */}
       <div style={{
-        position: 'sticky', bottom: 68, background: 'var(--c-surface)',
-        borderTop: '1px solid var(--c-border)', padding: '10px 16px',
-        display: 'flex', gap: 10, boxShadow: '0 -4px 12px rgba(0,0,0,.06)',
+        flexShrink: 0,
+        background: 'var(--c-surface)',
+        borderTop: '1px solid var(--c-border)',
+        padding: '10px 16px',
+        paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
+        display: 'flex', gap: 10,
+        boxShadow: '0 -4px 12px rgba(0,0,0,.06)',
       }}>
         <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setIdx(i => Math.max(0,i-1))} disabled={idx === 0}>← Prev</button>
         {idx < cfg.questions.length - 1

@@ -116,37 +116,45 @@ export default function App() {
           </div>
         )}
 
-        {/* ── Global controls ── */}
-        <div style={{
-          position: 'fixed',
-          top: online ? 10 : 38,
-          right: 12,
-          zIndex: 300,
-          display: 'flex',
-          gap: 6,
-          alignItems: 'center',
-          transition: 'top 0.2s ease',
-        }}>
-          <button className="lang-toggle" onClick={toggleLang} title="Switch language">
-            <span className="lang-dot" />
-            <span className={langAnim ? 'lang-enter' : ''}>
-              {lang === 'en' ? 'ಕನ್ನಡ' : 'English'}
-            </span>
-          </button>
-          <button
-            onClick={toggleDark}
-            style={{
-              background: 'var(--c-surface-2)', border: '1.5px solid var(--c-border)',
-              borderRadius: '50%', width: 34, height: 34,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: 16, transition: 'var(--t-base)',
-              boxShadow: 'var(--shadow-xs)',
-            }}
-            title="Toggle dark mode"
-          >
-            {dark ? '☀️' : '🌙'}
-          </button>
-        </div>
+        {/* ── Global top controls bar (lang + dark) — no overlap ── */}
+        {nav.tab !== 'practice' && nav.tab !== 'test' && (
+          <div style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 200,
+            background: 'var(--c-surface)',
+            borderBottom: '1px solid var(--c-border)',
+            height: 48,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            padding: '0 12px',
+            gap: 8,
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}>
+            <button className="lang-toggle" onClick={toggleLang} title="Switch language"
+              style={{ fontSize: 12 }}>
+              <span className="lang-dot" />
+              <span className={langAnim ? 'lang-enter' : ''}>
+                {lang === 'en' ? 'ಕನ್ನಡ' : 'English'}
+              </span>
+            </button>
+            <button
+              onClick={toggleDark}
+              style={{
+                background: 'var(--c-surface-2)', border: '1.5px solid var(--c-border)',
+                borderRadius: '50%', width: 32, height: 32,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', fontSize: 15, transition: 'var(--t-base)',
+                flexShrink: 0,
+              }}
+              title="Toggle dark mode"
+            >
+              {dark ? '☀️' : '🌙'}
+            </button>
+          </div>
+        )}
 
         {/* ── Main Content ── */}
         <main className="main-content">
