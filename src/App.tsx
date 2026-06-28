@@ -1,12 +1,15 @@
-// src/App.tsx — upgraded shell with offline banner, smooth lang toggle, dark mode
+// src/App.tsx — With login, LangContext, exam date, offline banner, full bilingual
 import React, { useState, useCallback, useEffect } from 'react';
+import { LangContext } from './lib/LangContext';
+import { t } from './lib/i18n';
+import { getDarkMode, setDarkMode, getLang, setLang } from './lib/storage';
+import { LoginScreen } from './components/LoginScreen';
 import BottomNav from './components/BottomNav';
 import Home from './components/Home';
 import PracticeView from './components/PracticeView';
 import MockTestView from './components/MockTestView';
 import InsightsView from './components/InsightsView';
 import ProgressView from './components/ProgressView';
-import { getDarkMode, setDarkMode, getLang, setLang } from './lib/storage';
 
 type Tab = 'home' | 'practice' | 'test' | 'insights' | 'progress';
 
@@ -17,11 +20,30 @@ interface NavState {
   insightsInitialSection?: string;
 }
 
+interface UserProfile {
+  name: string;
+  email: string;
+  avatar: string;
+}
+
+const PROFILE_KEY = 'ksp_user_profile';
+
+function loadProfile(): UserProfile | null {
+  try {
+    const s = localStorage.getItem(PROFILE_KEY);
+    return s ? JSON.parse(s) : null;
+  } catch { return null; }
+}
+function saveProfile(p: UserProfile) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+}
+
 export default function App() {
-  const [dark, setDark]       = useState(() => getDarkMode());
-  const [lang, setLangState]  = useState<'en' | 'kn'>(() => getLang());
-  const [nav, setNav]         = useState<NavState>({ tab: 'home' });
-  const [online, setOnline]   = useState(navigator.onLine);
+  const [dark,    setDark]      = useState(() => getDarkMode());
+  const [lang,    setLangState] = useState<'en' | 'kn'>(() => getLang());
+  const [nav,     setNav]       = useState<NavState>({ tab: 'home' });
+  const [online,  setOnline]    = useState(navigator.onLine);
+  const [profile, setProfile]   = useState<UserProfile | null>(() => loadProfile());
   const [langAnim, setLangAnim] = useState(false);
 
   // Dark mode
@@ -41,16 +63,16 @@ export default function App() {
   const navigate = useCallback((tab: Tab, extra?: Record<string, unknown>) => {
     setNav({
       tab,
-      practiceInitialTopic:    extra?.topic    as string | undefined,
-      testInitialType:         extra?.type     as string | undefined,
-      insightsInitialSection:  extra?.section  as string | undefined,
+      practiceInitialTopic:   extra?.topic   as string | undefined,
+      testInitialType:        extra?.type    as string | undefined,
+      insightsInitialSection: extra?.section as string | undefined,
     });
   }, []);
 
   const toggleLang = () => {
     const next = lang === 'en' ? 'kn' : 'en';
     setLangAnim(true);
-    setTimeout(() => setLangAnim(false), 200);
+    setTimeout(() => setLangAnim(false), 180);
     setLangState(next);
     setLang(next);
   };
@@ -61,93 +83,120 @@ export default function App() {
     setDarkMode(next);
   };
 
-  return (
-    <div className="app-shell">
+  const handleLogin = (p: UserProfile) => {
+    saveProfile(p);
+    setProfile(p);
+  };
 
-      {/* ── Offline Banner ── */}
-      {!online && (
-        <div className="offline-banner">
-          <span>📵</span>
-          <span>Offline — All 2,499 questions available locally</span>
-        </div>
-      )}
+  const handleLogout = () => {
+    localStorage.removeItem(PROFILE_KEY);
+    setProfile(null);
+  };
 
-      {/* ── Global controls: lang + dark — top right ── */}
-      <div style={{
-        position: 'fixed', top: online ? 10 : 38, right: 12, zIndex: 300,
-        display: 'flex', gap: 6, alignItems: 'center',
-        transition: 'top 0.2s ease',
-      }}>
-        <button
-          className="lang-toggle"
-          onClick={toggleLang}
-          title="Toggle language"
-        >
-          <span className="lang-dot" />
-          <span className={langAnim ? 'lang-enter' : ''}>
-            {lang === 'en' ? 'ಕನ್ನಡ' : 'English'}
-          </span>
-        </button>
-        <button
-          onClick={toggleDark}
-          style={{
-            background: 'var(--c-surface-2)',
-            border: '1.5px solid var(--c-border)',
-            borderRadius: '50%',
-            width: 34, height: 34,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', fontSize: 16,
-            transition: 'var(--t-base)',
-            boxShadow: 'var(--shadow-xs)',
-          }}
-          title="Toggle dark mode"
-        >
-          {dark ? '☀️' : '🌙'}
-        </button>
+  // ── Show Login if no profile ──────────────────────────
+  if (!profile) {
+    return (
+      <div className="app-shell">
+        <LoginScreen
+          onLogin={handleLogin}
+          isDark={dark}
+          onToggleDark={toggleDark}
+        />
       </div>
+    );
+  }
 
-      {/* ── Main Content ── */}
-      <main className="main-content">
-        {nav.tab === 'home' && (
-          <div className="page-enter">
-            <Home lang={lang} onNavigate={(tab, extra) => navigate(tab, extra)} />
-          </div>
-        )}
-        {nav.tab === 'practice' && (
-          <div className="page-enter">
-            <PracticeView
-              lang={lang}
-              onLangToggle={toggleLang}
-              initialTopic={nav.practiceInitialTopic}
-              key={nav.practiceInitialTopic ?? 'practice'}
-            />
-          </div>
-        )}
-        {nav.tab === 'test' && (
-          <div className="page-enter">
-            <MockTestView
-              lang={lang}
-              initialType={nav.testInitialType}
-              key={nav.testInitialType ?? 'test'}
-            />
-          </div>
-        )}
-        {nav.tab === 'insights' && (
-          <div className="page-enter">
-            <InsightsView
-              initialSection={nav.insightsInitialSection}
-              onPracticeQuestions={() => navigate('practice', { topic: 'High Repeat Questions' })}
-            />
-          </div>
-        )}
-        {nav.tab === 'progress' && (
-          <div className="page-enter">
-            <ProgressView />
-          </div>
-        )}
-      </main>
+  // ── Main App ──────────────────────────────────────────
+  return (
+    <LangContext.Provider value={lang}>
+      <div className="app-shell">
 
-      <BottomNav active={nav.tab} onSelect={(t) => navigate(t)} />
-    </div>
+        {/* Offline banner */}
+        {!online && (
+          <div className="offline-banner">
+            <span>📵</span>
+            <span className={lang === 'kn' ? 'kn' : ''}>{t('offline_msg', lang)}</span>
+          </div>
+        )}
+
+        {/* Global controls: lang + dark */}
+        <div style={{
+          position: 'fixed',
+          top: online ? 10 : 38,
+          right: 12,
+          zIndex: 300,
+          display: 'flex',
+          gap: 6,
+          alignItems: 'center',
+          transition: 'top 0.2s ease',
+        }}>
+          <button className="lang-toggle" onClick={toggleLang} title="Toggle language">
+            <span className="lang-dot" />
+            <span className={langAnim ? 'lang-enter' : ''}>
+              {lang === 'en' ? 'ಕನ್ನಡ' : 'English'}
+            </span>
+          </button>
+          <button
+            onClick={toggleDark}
+            style={{
+              background: 'var(--c-surface-2)',
+              border: '1.5px solid var(--c-border)',
+              borderRadius: '50%',
+              width: 34, height: 34,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', fontSize: 16,
+              transition: 'var(--t-base)',
+              boxShadow: 'var(--shadow-xs)',
+            }}
+            title="Toggle dark mode"
+          >
+            {dark ? '☀️' : '🌙'}
+          </button>
+        </div>
+
+        {/* Main content */}
+        <main className="main-content">
+          {nav.tab === 'home' && (
+            <div className="page-enter">
+              <Home lang={lang} onNavigate={(tab, extra) => navigate(tab, extra)} />
+            </div>
+          )}
+          {nav.tab === 'practice' && (
+            <div className="page-enter">
+              <PracticeView
+                lang={lang}
+                onLangToggle={toggleLang}
+                initialTopic={nav.practiceInitialTopic}
+                key={nav.practiceInitialTopic ?? 'practice'}
+              />
+            </div>
+          )}
+          {nav.tab === 'test' && (
+            <div className="page-enter">
+              <MockTestView
+                lang={lang}
+                initialType={nav.testInitialType}
+                key={nav.testInitialType ?? 'test'}
+              />
+            </div>
+          )}
+          {nav.tab === 'insights' && (
+            <div className="page-enter">
+              <InsightsView
+                initialSection={nav.insightsInitialSection}
+                onPracticeQuestions={() => navigate('practice', { topic: 'High Repeat Questions' })}
+              />
+            </div>
+          )}
+          {nav.tab === 'progress' && (
+            <div className="page-enter">
+              <ProgressView />
+            </div>
+          )}
+        </main>
+
+        <BottomNav active={nav.tab} onSelect={(tab) => navigate(tab)} />
+      </div>
+    </LangContext.Provider>
   );
 }
