@@ -473,7 +473,7 @@ function ActiveTest({
       position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
       width: '100%', maxWidth: 540,
       background: 'var(--c-surface)',
-      zIndex: 90,
+      zIndex: 110,  /* above bottom-nav (100) so footer buttons are never covered */
     }}>
       {/* Test header */}
       <div style={{
