@@ -1,0 +1,76 @@
+{
+  "cycles": [
+    {
+      "year": 2019,
+      "notification": "KSP PC Civil 2019",
+      "examDate": "2019-10-06",
+      "vacancies": { "total": 1591, "NKK": 1400, "KK": 191 },
+      "applicants": 72000,
+      "ratio": "1:45",
+      "topperScore": 81,
+      "cutoffRank500Score": 71,
+      "topRangeScore": "76–81",
+      "paperDifficulty": 3
+    },
+    {
+      "year": 2021,
+      "notification": "KSP PC Civil 2021",
+      "examDate": "2022-01-09",
+      "vacancies": { "total": 3484, "NKK": 3000, "KK": 484 },
+      "applicants": 130000,
+      "ratio": "1:37",
+      "topperScore": 83,
+      "cutoffRank500Score": 73,
+      "topRangeScore": "78–83",
+      "paperDifficulty": 3
+    },
+    {
+      "year": 2023,
+      "notification": "KSP PC Civil NKK 2023",
+      "examDate": "2024-02-25",
+      "vacancies": { "total": 1137, "NKK": 1137, "KK": 0 },
+      "applicants": 450000,
+      "ratio": "1:396",
+      "topperScore": 88,
+      "cutoffRank500Score": 77,
+      "topRangeScore": "82–88",
+      "paperDifficulty": 4
+    },
+    {
+      "year": 2024,
+      "notification": "KSP PC Civil 2024",
+      "examDate": "2024-06-15",
+      "vacancies": { "total": 2651, "NKK": 2300, "KK": 351 },
+      "applicants": 500000,
+      "ratio": "1:189",
+      "topperScore": 86,
+      "cutoffRank500Score": 75,
+      "topRangeScore": "80–86",
+      "paperDifficulty": 4
+    },
+    {
+      "year": 2026,
+      "notification": "KSP PC Civil 2026",
+      "examDate": null,
+      "applicationDeadline": "2026-07-03",
+      "vacancies": { "total": 3991, "NKK": 3500, "KK": 491 },
+      "applicants": null,
+      "ratio": "est. 1:150+",
+      "topperScore": null,
+      "cutoffRank500Score": null,
+      "topRangeScore": null,
+      "paperDifficulty": null,
+      "status": "upcoming"
+    }
+  ],
+  "topicWeightByYear": {
+    "2014": { "Karnataka_GK": 20, "Indian_History": 18, "Indian_Polity": 9, "Geography": 6, "Biology": 8, "Chemistry": 7, "Physics": 4, "Current_Affairs": 6, "Reasoning": 4, "Maths": 6, "Others": 12 },
+    "2015": { "Karnataka_GK": 25, "Indian_History": 18, "Indian_Polity": 10, "Geography": 15, "Biology": 7, "Chemistry": 2, "Physics": 4, "Current_Affairs": 6, "Reasoning": 2, "Maths": 1, "Others": 10 },
+    "2016": { "Karnataka_GK": 15, "Indian_History": 16, "Indian_Polity": 6, "Geography": 7, "Biology": 6, "Chemistry": 5, "Physics": 4, "Current_Affairs": 4, "Reasoning": 9, "Maths": 6, "Others": 22 },
+    "2017": { "Karnataka_GK": 0, "Indian_History": 0, "Indian_Polity": 0, "Geography": 0, "Biology": 0, "Chemistry": 0, "Physics": 0, "Current_Affairs": 0, "Reasoning": 8, "Maths": 1, "Miscellaneous": 91 },
+    "2018": { "Karnataka_GK": 0, "Indian_History": 0, "Indian_Polity": 0, "Geography": 0, "Biology": 10, "Chemistry": 4, "Physics": 0, "Current_Affairs": 0, "Reasoning": 24, "Maths": 4, "Others": 58 },
+    "2019": { "Karnataka_GK": 0, "Indian_History": 0, "Indian_Polity": 0, "Geography": 0, "Biology": 0, "Chemistry": 2, "Physics": 0, "Current_Affairs": 0, "Reasoning": 14, "Maths": 5, "Others": 79 },
+    "2020": { "Karnataka_GK": 0, "Indian_History": 0, "Indian_Polity": 0, "Geography": 0, "Music_Theory": 8, "Chemistry": 0, "Physics": 0, "Current_Affairs": 0, "Reasoning": 38, "Maths": 7, "Others": 47 },
+    "2021": { "Karnataka_GK": 0, "Indian_History": 0, "Indian_Polity": 0, "Geography": 0, "Biology": 0, "Chemistry": 1, "Physics": 0, "Current_Affairs": 0, "Reasoning": 0, "Maths": 0, "Others": 99 }
+  }
+}

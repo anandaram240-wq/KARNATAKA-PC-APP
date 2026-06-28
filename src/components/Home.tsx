@@ -1,160 +1,268 @@
 // src/components/Home.tsx
-import React from 'react';
-import { getProgressStats } from '../lib/storage';
+import React, { useMemo } from 'react';
+import allQuestions from '../data/pyqs.json';
+import { getTodaysFocus } from '../lib/studyEngine';
+import { getStreak, getOverallStats, getAllTests, getTodayStudied } from '../lib/storage';
+import { getRisingTopics } from '../lib/trendEngine';
+
+type Tab = 'home' | 'practice' | 'test' | 'insights' | 'progress';
 
 interface Props {
-  user: { name: string; email: string; avatar: string };
-  onNavigate: (tab: 'practice' | 'test') => void;
-  onLogout: () => void;
-  isDark: boolean;
-  onToggleDark: () => void;
-  lang: 'en' | 'kn';
-  onToggleLang: () => void;
+  onNavigate: (tab: Tab, extra?: Record<string, unknown>) => void;
 }
 
-const T = {
-  en: {
-    hello: 'Hello',
-    tagline: 'Karnataka Police Constable PYQs',
-    startPractice: 'Start Practice',
-    takeMockTest: 'Take Mock Test',
-    totalDone: 'Questions Done',
-    accuracy: 'Accuracy',
-    tests: 'Tests Taken',
-    bestScore: 'Best Score',
-    pyqsAvailable: 'PYQs Available',
-    years: 'Years Covered',
-    subjects: '4 Subjects',
-    signOut: 'Sign Out',
-    practiceDesc: 'Browse by year, subject or topic',
-    testDesc: 'Full paper — timed, with score',
-  },
-  kn: {
-    hello: 'ನಮಸ್ಕಾರ',
-    tagline: 'ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ಕಾನ್‌ಸ್ಟೇಬಲ್ PYQ ಪ್ರಶ್ನೆಗಳು',
-    startPractice: 'ಅಭ್ಯಾಸ ಪ್ರಾರಂಭಿಸಿ',
-    takeMockTest: 'ಮಾಕ್ ಟೆಸ್ಟ್ ತೆಗೆದುಕೊಳ್ಳಿ',
-    totalDone: 'ಪ್ರಶ್ನೆಗಳು ಮಾಡಿದ',
-    accuracy: 'ನಿಖರತೆ',
-    tests: 'ಪರೀಕ್ಷೆ ತೆಗೆದ',
-    bestScore: 'ಅತ್ಯುತ್ತಮ ಸ್ಕೋರ್',
-    pyqsAvailable: 'ಪ್ರಶ್ನೆಗಳು ಲಭ್ಯ',
-    years: 'ವರ್ಷಗಳ ಪ್ರಶ್ನೆ',
-    subjects: '4 ವಿಷಯಗಳು',
-    signOut: 'ಸೈನ್ ಔಟ್',
-    practiceDesc: 'ವರ್ಷ, ವಿಷಯ ಅಥವಾ ಟಾಪಿಕ್ ಮೂಲಕ ಆಯ್ಕೆ',
-    testDesc: 'ಸಮಯ ಸಹಿತ ಪೂರ್ಣ ಪ್ರಶ್ನೆ ಪತ್ರ',
-  },
+const SUBJECT_EMOJI: Record<string, string> = {
+  'General Awareness': '🇮🇳',
+  'General Science':   '🔬',
+  'Reasoning':         '🧩',
+  'Mathematics':       '🔢',
 };
 
-export function Home({ user, onNavigate, onLogout, isDark, onToggleDark, lang, onToggleLang }: Props) {
-  const t = T[lang];
-  const stats = getProgressStats();
-  const isGuest = user.email === 'guest@local';
+const LABEL_COLOR: Record<string, string> = {
+  '🔴 Critical': '#DC2626',
+  '🟠 High':     '#EA580C',
+  '🟡 Medium':   '#D97706',
+  '🟢 Done':     '#16A34A',
+};
+
+export default function Home({ onNavigate }: Props) {
+  const streak  = useMemo(() => getStreak(), []);
+  const stats   = useMemo(() => getOverallStats(), []);
+  const tests   = useMemo(() => getAllTests(), []);
+  const todayQs = useMemo(() => getTodayStudied(), []);
+  const focus   = useMemo(() => getTodaysFocus(allQuestions as never, 4), []);
+  const rising  = useMemo(() => getRisingTopics(allQuestions as never), []);
+
+  const avgScore = tests.length
+    ? Math.round(tests.slice(0, 5).reduce((s, t) => s + (t.score / t.total) * 100, 0) / Math.min(tests.length, 5))
+    : null;
+
+  const hours = new Date().getHours();
+  const greeting = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
+  const examDays = Math.ceil((new Date('2026-07-15').getTime() - Date.now()) / 86400000);
 
   return (
-    <div style={{ minHeight: '100dvh', background: 'var(--c-surface)', paddingBottom: 80 }}>
-      {/* ── Top Bar ── */}
-      <div className="top-bar" style={{ justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 9,
-            background: 'var(--c-primary)', color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 800, fontSize: 15, flexShrink: 0,
-          }}>K</div>
-          <span style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', color: 'var(--c-text)' }}>KSP PC</span>
+    <div className="page page-gap" style={{ paddingTop: 8 }}>
+
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ fontSize: 13, color: 'var(--c-text-3)', fontWeight: 500 }}>{greeting} 👋</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--c-text)', lineHeight: 1.2 }}>
+            KSP Tayyari
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button className="btn-ghost" onClick={onToggleLang}
-            style={{ padding: '5px 10px', fontSize: 12, fontWeight: 700 }}>
-            {lang === 'en' ? 'ಕ' : 'EN'}
+        <div style={{ textAlign: 'right' }}>
+          {streak.current > 0 && (
+            <div style={{ fontSize: 24, lineHeight: 1 }}>🔥</div>
+          )}
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#EA580C' }}>
+            {streak.current} day streak
+          </div>
+        </div>
+      </div>
+
+      {/* ── Exam countdown ── */}
+      <div className="card-primary" style={{ borderRadius: 14, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 100, opacity: 0.07 }}>🚔</div>
+        <div style={{ fontSize: 12, fontWeight: 600, opacity: 0.8, marginBottom: 4 }}>
+          KSP CPC 2026 — Applications close July 3
+        </div>
+        <div style={{ fontSize: 32, fontWeight: 900, lineHeight: 1 }}>
+          ~{examDays} <span style={{ fontSize: 16, fontWeight: 600 }}>days to prepare</span>
+        </div>
+        <div style={{ fontSize: 12, marginTop: 6, opacity: 0.85 }}>
+          3,991 vacancies • Most competitive cycle yet (est. 1:70+ ratio)
+        </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+          <button className="btn btn-sm" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', borderRadius: 8 }}
+            onClick={() => onNavigate('test')}>
+            Start Mock Test
           </button>
-          <button className="btn-ghost" onClick={onToggleDark}
-            style={{ padding: '5px 10px', fontSize: 14 }}>
-            {isDark ? '☀️' : '🌙'}
+          <button className="btn btn-sm" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', borderRadius: 8 }}
+            onClick={() => onNavigate('insights')}>
+            Cutoff Check
           </button>
         </div>
       </div>
 
-      <div style={{ padding: '20px 16px', maxWidth: 500, margin: '0 auto' }}>
-        {/* ── User greeting ── */}
-        <div className="card" style={{ padding: '18px 18px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
-          <img
-            src={user.avatar}
-            alt={user.name}
-            referrerPolicy="no-referrer"
-            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4f46e5&color=fff`; }}
-            style={{ width: 48, height: 48, borderRadius: '50%', flexShrink: 0 }}
-          />
-          <div>
-            <div style={{ fontSize: 13, color: 'var(--c-text-muted)', fontWeight: 500 }}>{t.hello},</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--c-text)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-              {isGuest ? 'Guest' : user.name.split(' ')[0]}
+      {/* ── Quick stats ── */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{stats.total}</div>
+          <div className="stat-label">Qs Done</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value" style={{ color: stats.accuracy >= 70 ? 'var(--c-correct)' : stats.accuracy >= 50 ? 'var(--c-warn)' : 'var(--c-wrong)' }}>
+            {stats.accuracy}%
+          </div>
+          <div className="stat-label">Accuracy</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{tests.length}</div>
+          <div className="stat-label">Tests</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value" style={{ color: '#EA580C' }}>{streak.current}🔥</div>
+          <div className="stat-label">Streak</div>
+        </div>
+      </div>
+
+      {/* ── Today's Focus ── */}
+      <div>
+        <div className="section-header">
+          <span className="section-title">🎯 Today's Focus</span>
+          <span style={{ fontSize: 11, color: 'var(--c-text-3)' }}>Smart Priority</span>
+        </div>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          {focus.length === 0 ? (
+            <div style={{ padding: 20, textAlign: 'center', color: 'var(--c-text-3)', fontSize: 14 }}>
+              🎉 All topics completed! Take a mock test.
             </div>
-            <div style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 1 }}>{t.tagline}</div>
+          ) : (
+            focus.map((t, i) => (
+              <button
+                key={t.topic}
+                className="priority-item"
+                style={{
+                  width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                  padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12,
+                  borderBottom: i < focus.length - 1 ? '1px solid var(--c-border)' : 'none',
+                  textAlign: 'left'
+                }}
+                onClick={() => onNavigate('practice', { topic: t.topic })}
+              >
+                <div className="priority-rank" style={{
+                  background: i === 0 ? '#FEE2E2' : i === 1 ? '#FFEDD5' : '#FEF3C7',
+                  color: LABEL_COLOR[t.label] ?? '#64748B',
+                  fontSize: 13, fontWeight: 800
+                }}>
+                  {i + 1}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--c-text)', marginBottom: 3 }}>
+                    {t.topic}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="progress-bar" style={{ flex: 1, height: 3 }}>
+                      <div className="progress-fill" style={{ width: `${t.completionPct}%` }} />
+                    </div>
+                    <span style={{ fontSize: 11, color: 'var(--c-text-3)', whiteSpace: 'nowrap' }}>
+                      {t.doneQuestions}/{t.totalQuestions}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: LABEL_COLOR[t.label], whiteSpace: 'nowrap' }}>
+                  {t.label.split(' ')[1]}
+                </div>
+                <svg style={{ width: 16, color: 'var(--c-text-4)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            ))
+          )}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--c-text-3)', marginTop: 6, paddingLeft: 2 }}>
+          Priority = Topic frequency × exam weight × (1 − your completion)
+        </div>
+      </div>
+
+      {/* ── Today's score & avg ── */}
+      {avgScore !== null && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div className="card" style={{ textAlign: 'center', padding: 14 }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: avgScore >= 75 ? 'var(--c-correct)' : avgScore >= 60 ? 'var(--c-warn)' : 'var(--c-wrong)' }}>
+              {avgScore}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--c-text-3)', marginTop: 2 }}>Avg Mock Score</div>
+            <div style={{ fontSize: 10, color: 'var(--c-text-4)', marginTop: 4 }}>
+              General cutoff: ~75
+            </div>
+          </div>
+          <div className="card" style={{ textAlign: 'center', padding: 14 }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--c-primary)' }}>
+              {todayQs}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--c-text-3)', marginTop: 2 }}>Qs Today</div>
+            <div style={{ fontSize: 10, color: 'var(--c-text-4)', marginTop: 4 }}>
+              Goal: 30 questions
+            </div>
           </div>
         </div>
+      )}
 
-        {/* ── Stats row ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+      {/* ── Quick actions ── */}
+      <div>
+        <div className="section-title" style={{ marginBottom: 12 }}>Quick Start</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {[
-            { label: t.totalDone, value: stats.totalPracticed.toLocaleString('en-IN') },
-            { label: t.accuracy, value: stats.totalPracticed > 0 ? `${stats.accuracy}%` : '—' },
-            { label: t.tests, value: stats.totalTests },
-            { label: t.bestScore, value: stats.bestScore > 0 ? `${stats.bestScore}%` : '—' },
-          ].map(({ label, value }) => (
-            <div key={label} className="card-sm" style={{ padding: '14px 16px' }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--c-primary)', fontVariantNumeric: 'tabular-nums' }}>{value}</div>
-              <div style={{ fontSize: 11, color: 'var(--c-text-muted)', marginTop: 2, fontWeight: 500 }}>{label}</div>
-            </div>
+            { icon: '📄', label: 'Full Mock Test', sub: '100 Qs · 90 min', tab: 'test' as Tab, extra: { type: 'full' } },
+            { icon: '📚', label: 'PYQ Practice', sub: '2,499 questions', tab: 'practice' as Tab, extra: {} },
+            { icon: '📊', label: 'Cutoff Check', sub: 'Your safe zone', tab: 'insights' as Tab, extra: { section: 'cutoff' } },
+            { icon: '📈', label: 'My Progress', sub: 'Accuracy & topics', tab: 'progress' as Tab, extra: {} },
+          ].map(({ icon, label, sub, tab, extra }) => (
+            <button
+              key={label}
+              className="card card-hover"
+              style={{ border: 'none', cursor: 'pointer', textAlign: 'left', padding: 14 }}
+              onClick={() => onNavigate(tab, extra)}
+            >
+              <div style={{ fontSize: 28, marginBottom: 6 }}>{icon}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--c-text)' }}>{label}</div>
+              <div style={{ fontSize: 12, color: 'var(--c-text-3)', marginTop: 2 }}>{sub}</div>
+            </button>
           ))}
         </div>
+      </div>
 
-        {/* ── Quick actions ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
-          <button className="btn-primary" onClick={() => onNavigate('practice')}
-            style={{ width: '100%', padding: '16px', fontSize: 15, borderRadius: 12, flexDirection: 'column', gap: 2, height: 'auto' }}>
-            <span style={{ fontSize: 15, fontWeight: 800 }}>{t.startPractice}</span>
-            <span style={{ fontSize: 12, opacity: 0.8, fontWeight: 500 }}>{t.practiceDesc}</span>
-          </button>
-          <button className="btn-ghost" onClick={() => onNavigate('test')}
-            style={{ width: '100%', padding: '16px', fontSize: 15, borderRadius: 12, flexDirection: 'column', gap: 2, height: 'auto' }}>
-            <span style={{ fontSize: 15, fontWeight: 700 }}>{t.testDesc.includes('Full') ? t.takeMockTest : t.takeMockTest}</span>
-            <span style={{ fontSize: 12, fontWeight: 500 }}>{t.testDesc}</span>
-          </button>
-        </div>
-
-        {/* ── App info ── */}
-        <div className="card-sm" style={{ padding: '14px 16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
-            {[
-              { value: '2,499', label: t.pyqsAvailable },
-              { value: '2014–21', label: t.years },
-              { value: t.subjects, label: '' },
-            ].map(({ value, label }) => (
-              <div key={value}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--c-text)' }}>{value}</div>
-                {label && <div style={{ fontSize: 10, color: 'var(--c-text-faint)', fontWeight: 500 }}>{label}</div>}
-              </div>
+      {/* ── Rising topics ── */}
+      {rising.length > 0 && (
+        <div>
+          <div className="section-header">
+            <span className="section-title">🔥 Trending Topics</span>
+            <span style={{ fontSize: 11, color: 'var(--c-text-3)' }}>Increasing in recent papers</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {rising.slice(0, 3).map(({ topic, recentCount }) => (
+              <button
+                key={topic}
+                className="card card-hover"
+                style={{ border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px' }}
+                onClick={() => onNavigate('practice', { topic })}
+              >
+                <span className="badge badge-hot">🔥 HOT</span>
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{topic}</div>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--c-text-3)' }}>{recentCount} Qs →</div>
+              </button>
             ))}
           </div>
         </div>
+      )}
 
-        {/* ── Sign out ── */}
-        <button
-          onClick={onLogout}
-          style={{
-            width: '100%', marginTop: 24, padding: '10px',
-            background: 'transparent', border: '1px solid var(--c-border)',
-            borderRadius: 10, color: 'var(--c-text-muted)',
-            fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            fontFamily: 'inherit',
-          }}
-        >
-          {t.signOut}
-        </button>
+      {/* ── Exam structure ── */}
+      <div className="card" style={{ background: 'var(--c-surface-2)' }}>
+        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>📋 Exam Pattern</div>
+        {[
+          { s: '🇮🇳 General Awareness', pct: '70%', qs: '~70 Qs', color: '#D97706' },
+          { s: '🔬 General Science',    pct: '21%', qs: '~21 Qs', color: '#16A34A' },
+          { s: '🧩 Reasoning',          pct: '7%',  qs: '~7 Qs',  color: '#7C3AED' },
+          { s: '🔢 Mathematics',         pct: '2%',  qs: '~2 Qs',  color: '#0EA5E9' },
+        ].map(({ s, pct, qs, color }) => (
+          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+            <div style={{ fontSize: 13, flex: 1, fontWeight: 500 }}>{s}</div>
+            <div className="progress-bar" style={{ width: 80, height: 5 }}>
+              <div className="progress-fill" style={{ width: pct, background: color }} />
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--c-text-3)', width: 42, textAlign: 'right' }}>{qs}</div>
+          </div>
+        ))}
+        <div style={{ fontSize: 11, color: 'var(--c-text-3)', marginTop: 8 }}>
+          100 Qs · 90 min · −0.25 negative marking · Min 30 marks to qualify
+        </div>
       </div>
+
     </div>
   );
 }

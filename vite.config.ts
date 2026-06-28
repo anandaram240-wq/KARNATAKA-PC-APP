@@ -7,6 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
+    base: mode === 'production' ? '/KARNATAKA-PC-APP/' : '/',
     plugins: [
       react(),
       tailwindcss(),
@@ -14,7 +15,7 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'favicon-32.png'],
         manifest: {
-          name: 'KSP Master Pro',
+          name: 'KSP Tayyari — ಕೆಎಸ್ಪಿ ತಯಾರಿ',
           short_name: 'KSP Master',
           description: 'Complete KSP Constable & Sub-Inspector Previous Year Questions (2014–2024) preparation — Practice, Mock Tests, Analytics',
           theme_color: '#1a365d',

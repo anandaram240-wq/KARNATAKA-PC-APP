@@ -1,116 +1,153 @@
-// src/lib/storage.ts
-// Simple localStorage wrapper — no AI, no complexity
+// src/lib/storage.ts — All localStorage persistence
 
-const PREFIX = 'ksp_';
+const KEYS = {
+  answered:  'ksp_answered',   // Record<questionId, {correct,ts}>
+  tests:     'ksp_tests',      // TestResult[]
+  streak:    'ksp_streak',     // StreakData
+  settings:  'ksp_settings',   // UserSettings
+  dark:      'ksp_dark',
+  lang:      'ksp_lang',
+};
 
-export interface TestRecord {
-  id: string;
-  date: string;
-  year: string | 'mixed';
-  subject: string | 'all';
-  total: number;
-  correct: number;
-  timeSec: number;
-  subjectBreakdown: Record<string, { total: number; correct: number }>;
-}
-
-export interface PracticeRecord {
-  questionId: number;
+export interface AnsweredQuestion {
   correct: boolean;
-  date: string;
+  ts: number;       // timestamp
+  timeSec: number;  // seconds taken
 }
 
-function get<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(PREFIX + key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch { return fallback; }
+export interface TestResult {
+  id: string;
+  type: 'full' | 'year' | 'subject' | 'topic' | 'smart';
+  label: string;
+  date: number;
+  score: number;
+  total: number;
+  timeSec: number;
+  breakdown: Record<string, { correct: number; total: number }>;
+  answers: Record<number, number>; // qid → chosen option index
 }
 
-function set<T>(key: string, value: T): void {
-  try { localStorage.setItem(PREFIX + key, JSON.stringify(value)); } catch {}
+export interface StreakData {
+  current: number;
+  best: number;
+  lastDate: string; // YYYY-MM-DD
+  days: string[];   // YYYY-MM-DD array
 }
 
-// ── Practice history ──────────────────────────────────────────────────────
-export function getPracticeHistory(): PracticeRecord[] {
-  return get<PracticeRecord[]>('practice_history', []);
+export interface UserSettings {
+  category: 'General' | 'OBC_2A' | 'OBC_2B' | 'OBC_3A' | 'OBC_3B' | 'SC' | 'ST' | 'CAT01';
+  region: 'NKK' | 'KK';
+  gender: 'M' | 'F';
 }
 
-export function addPracticeRecord(record: PracticeRecord): void {
-  const history = getPracticeHistory();
-  history.push(record);
-  // keep last 5000 only
-  set('practice_history', history.slice(-5000));
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function load<T>(key: string, fallback: T): T {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+function save(key: string, val: unknown) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
 }
 
-// ── Test history ──────────────────────────────────────────────────────────
-export function getTestHistory(): TestRecord[] {
-  return get<TestRecord[]>('test_history', []);
-}
+// ── Theme & Language ───────────────────────────────────────────────────────────
+export const getDarkMode = () => load(KEYS.dark, false);
+export const setDarkMode = (v: boolean) => save(KEYS.dark, v);
+export const getLang = (): 'en' | 'kn' => load(KEYS.lang, 'en');
+export const setLang = (v: 'en' | 'kn') => save(KEYS.lang, v);
 
-export function addTestRecord(record: TestRecord): void {
-  const history = getTestHistory();
-  history.unshift(record); // newest first
-  set('test_history', history.slice(0, 200));
-}
+// ── Settings ───────────────────────────────────────────────────────────────────
+export const getSettings = (): UserSettings =>
+  load(KEYS.settings, { category: 'General', region: 'NKK', gender: 'M' });
+export const saveSettings = (s: UserSettings) => save(KEYS.settings, s);
 
-// ── Progress stats (derived) ──────────────────────────────────────────────
-export interface ProgressStats {
-  totalPracticed: number;
-  totalCorrect: number;
-  accuracy: number;
-  totalTests: number;
-  bestScore: number;
-  lastScore: number;
-  subjectAccuracy: Record<string, { total: number; correct: number }>;
-  recentTests: TestRecord[];
-}
+// ── Answered questions ─────────────────────────────────────────────────────────
+export const getAllAnswered = (): Record<number, AnsweredQuestion> =>
+  load(KEYS.answered, {});
 
-export function getProgressStats(): ProgressStats {
-  const tests = getTestHistory();
-  const practice = getPracticeHistory();
+export const markAnswered = (qid: number, correct: boolean, timeSec = 0) => {
+  const all = getAllAnswered();
+  all[qid] = { correct, ts: Date.now(), timeSec };
+  save(KEYS.answered, all);
+  touchStreak();
+};
 
-  const totalPracticed = practice.length;
-  const totalCorrect = practice.filter(p => p.correct).length;
-  const accuracy = totalPracticed > 0 ? Math.round((totalCorrect / totalPracticed) * 100) : 0;
-  const scores = tests.map(t => Math.round((t.correct / t.total) * 100));
-  const bestScore = scores.length ? Math.max(...scores) : 0;
-  const lastScore = scores.length ? scores[0] : 0;
+export const isAnswered = (qid: number) => qid in getAllAnswered();
 
-  const subjectAccuracy: Record<string, { total: number; correct: number }> = {};
-  practice.forEach(() => {}); // placeholder — we track via tests
-  tests.forEach(t => {
-    Object.entries(t.subjectBreakdown).forEach(([subj, { total, correct }]) => {
-      if (!subjectAccuracy[subj]) subjectAccuracy[subj] = { total: 0, correct: 0 };
-      subjectAccuracy[subj].total += total;
-      subjectAccuracy[subj].correct += correct;
-    });
+// Per-topic stats
+export const getTopicStats = (questions: { id: number; topic: string; subject: string }[]) => {
+  const answered = getAllAnswered();
+  const map: Record<string, { total: number; done: number; correct: number }> = {};
+  questions.forEach(q => {
+    const k = q.subject + '::' + q.topic;
+    if (!map[k]) map[k] = { total: 0, done: 0, correct: 0 };
+    map[k].total++;
+    if (answered[q.id]) {
+      map[k].done++;
+      if (answered[q.id].correct) map[k].correct++;
+    }
   });
+  return map;
+};
 
-  return {
-    totalPracticed,
-    totalCorrect,
-    accuracy,
-    totalTests: tests.length,
-    bestScore,
-    lastScore,
-    subjectAccuracy,
-    recentTests: tests.slice(0, 10),
-  };
-}
+// Per-subject stats
+export const getSubjectStats = (questions: { id: number; subject: string }[]) => {
+  const answered = getAllAnswered();
+  const map: Record<string, { total: number; done: number; correct: number }> = {};
+  questions.forEach(q => {
+    if (!map[q.subject]) map[q.subject] = { total: 0, done: 0, correct: 0 };
+    map[q.subject].total++;
+    if (answered[q.id]) {
+      map[q.subject].done++;
+      if (answered[q.id].correct) map[q.subject].correct++;
+    }
+  });
+  return map;
+};
 
-// ── Dark mode preference ──────────────────────────────────────────────────
-export function getDarkMode(): boolean {
-  return get<boolean>('dark_mode', false);
-}
-export function setDarkMode(v: boolean): void {
-  set('dark_mode', v);
-}
+// Overall accuracy
+export const getOverallStats = () => {
+  const answered = getAllAnswered();
+  const entries = Object.values(answered);
+  const total = entries.length;
+  const correct = entries.filter(e => e.correct).length;
+  return { total, correct, accuracy: total ? Math.round((correct / total) * 100) : 0 };
+};
 
-// ── Language preference ───────────────────────────────────────────────────
-export function getLang(): 'en' | 'kn' {
-  return get<'en' | 'kn'>('lang', 'en');
-}
-export function setLang(v: 'en' | 'kn'): void {
-  set('lang', v);
-}
+// ── Test Results ───────────────────────────────────────────────────────────────
+export const getAllTests = (): TestResult[] => load(KEYS.tests, []);
+
+export const saveTestResult = (t: TestResult) => {
+  const all = getAllTests();
+  all.unshift(t);
+  save(KEYS.tests, all.slice(0, 50)); // keep last 50
+};
+
+// ── Streak ─────────────────────────────────────────────────────────────────────
+const today = () => new Date().toISOString().split('T')[0];
+
+export const getStreak = (): StreakData =>
+  load(KEYS.streak, { current: 0, best: 0, lastDate: '', days: [] });
+
+const touchStreak = () => {
+  const d = today();
+  const s = getStreak();
+  if (s.lastDate === d) return; // already counted today
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toISOString().split('T')[0];
+  const newStreak = s.lastDate === yStr ? s.current + 1 : 1;
+  const days = [...new Set([...s.days, d])].slice(-365);
+  save(KEYS.streak, {
+    current: newStreak,
+    best: Math.max(s.best, newStreak),
+    lastDate: d,
+    days,
+  });
+};
+
+export const getTodayStudied = () => {
+  const answered = getAllAnswered();
+  const t = Date.now();
+  const since = t - 86400000; // last 24h
+  return Object.values(answered).filter(a => a.ts > since).length;
+};

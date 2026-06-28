@@ -1,0 +1,80 @@
+[
+  {
+    "year": 2019, "examDate": "2019-10-06", "region": "NKK",
+    "vacancies": 1591, "estimatedApplicants": 72000, "ratio": "1:45",
+    "isEstimated": true,
+    "cutoffs": {
+      "General_M": 66, "General_F": 63,
+      "OBC_2A_M": 60, "OBC_2A_F": 57,
+      "OBC_2B_M": 58, "OBC_2B_F": 55,
+      "OBC_3A_M": 58, "OBC_3A_F": 55,
+      "OBC_3B_M": 58, "OBC_3B_F": 55,
+      "SC_M": 52, "SC_F": 49,
+      "ST_M": 48, "ST_F": 45,
+      "CAT01_M": 55, "CAT01_F": 52
+    },
+    "topperScore": 81, "rank500Score": 71, "difficulty": 3
+  },
+  {
+    "year": 2021, "examDate": "2022-01-09", "region": "NKK",
+    "vacancies": 3484, "estimatedApplicants": 130000, "ratio": "1:37",
+    "isEstimated": true,
+    "cutoffs": {
+      "General_M": 70, "General_F": 67,
+      "OBC_2A_M": 63, "OBC_2A_F": 60,
+      "OBC_2B_M": 61, "OBC_2B_F": 58,
+      "OBC_3A_M": 61, "OBC_3A_F": 58,
+      "OBC_3B_M": 61, "OBC_3B_F": 58,
+      "SC_M": 55, "SC_F": 52,
+      "ST_M": 51, "ST_F": 48,
+      "CAT01_M": 58, "CAT01_F": 55
+    },
+    "topperScore": 83, "rank500Score": 73, "difficulty": 3
+  },
+  {
+    "year": 2023, "examDate": "2024-02-25", "region": "NKK",
+    "vacancies": 1137, "estimatedApplicants": 450000, "ratio": "1:396",
+    "isEstimated": true,
+    "cutoffs": {
+      "General_M": 73, "General_F": 70,
+      "OBC_2A_M": 66, "OBC_2A_F": 63,
+      "OBC_2B_M": 64, "OBC_2B_F": 61,
+      "OBC_3A_M": 64, "OBC_3A_F": 61,
+      "OBC_3B_M": 64, "OBC_3B_F": 61,
+      "SC_M": 58, "SC_F": 55,
+      "ST_M": 54, "ST_F": 51,
+      "CAT01_M": 61, "CAT01_F": 58
+    },
+    "topperScore": 88, "rank500Score": 77, "difficulty": 4
+  },
+  {
+    "year": 2024, "examDate": "2024-06-15", "region": "NKK",
+    "vacancies": 2651, "estimatedApplicants": 500000, "ratio": "1:189",
+    "isEstimated": true,
+    "cutoffs": {
+      "General_M": 75, "General_F": 72,
+      "OBC_2A_M": 68, "OBC_2A_F": 65,
+      "OBC_2B_M": 65, "OBC_2B_F": 62,
+      "OBC_3A_M": 65, "OBC_3A_F": 62,
+      "OBC_3B_M": 65, "OBC_3B_F": 62,
+      "SC_M": 60, "SC_F": 57,
+      "ST_M": 56, "ST_F": 53,
+      "CAT01_M": 63, "CAT01_F": 60
+    },
+    "topperScore": 91, "rank500Score": 79, "difficulty": 4
+  },
+  {
+    "year": 2026, "examDate": null, "region": "NKK",
+    "applicationDeadline": "2026-07-03",
+    "vacancies": 3991, "estimatedApplicants": null, "ratio": "est. 1:70+",
+    "isEstimated": true,
+    "cutoffs": null,
+    "projectedCutoffs": {
+      "General_M": 77, "General_F": 74,
+      "OBC_2A_M": 70, "OBC_2A_F": 67,
+      "SC_M": 62, "SC_F": 59,
+      "ST_M": 58, "ST_F": 55
+    },
+    "status": "upcoming", "difficulty": null
+  }
+]
