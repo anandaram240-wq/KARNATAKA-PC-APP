@@ -50,10 +50,28 @@ function whenGoogleReady(fn: () => void) {
 }
 
 export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps) {
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError]           = useState('');
+  const [loading, setLoading]       = useState(false);
   const [googleReady, setGoogleReady] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
+  const [loginLang, setLoginLang]   = useState<'en'|'kn'>(() => (localStorage.getItem('ksp_lang') || 'en') as 'en'|'kn');
+
+  const L = {
+    title:  loginLang === 'kn' ? 'ಕೆಎಸ್ಪಿ ತಯಾರಿ' : 'KSP Tayyari',
+    sub:    loginLang === 'kn' ? 'ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ಕಾನ್‌ಸ್ಟೇಬಲ್ ಪರೀಕ್ಷೆ ತಯಾರಿ' : 'Karnataka Police Constable Exam Prep',
+    sync:   loginLang === 'kn' ? 'ಸಿಂಕ್‌ಗಾಗಿ ಸೈನ್ ಇನ್ ಮಾಡಿ' : 'Sign in to sync across devices',
+    guest:  loginLang === 'kn' ? '👤 ಅತಿಥಿಯಾಗಿ ಮುಂದುವರಿಯಿರಿ' : '👤 Continue as Guest',
+    guestSub: loginLang === 'kn' ? '(ಸೈನ್ ಇನ್ ಅಗತ್ಯವಿಲ್ಲ)' : '(no sign-in needed)',
+    local:  loginLang === 'kn' ? '🔒 Google = ಕ್ಲೌಡ್ ಸಿಂಕ್ · ಅತಿಥಿ = ಸ್ಥಳೀಯ ಮಾತ್ರ' : '🔒 Google login = cloud sync · Guest = local only',
+    signing: loginLang === 'kn' ? 'ಸೈನ್ ಇನ್ ಆಗುತ್ತಿದೆ…' : 'Signing you in…',
+    entering: loginLang === 'kn' ? 'ಅತಿಥಿಯಾಗಿ ಪ್ರವೇಶಿಸುತ್ತಿದೆ…' : 'Entering as Guest…',
+  };
+
+  const switchLang = () => {
+    const next = loginLang === 'en' ? 'kn' : 'en';
+    setLoginLang(next);
+    localStorage.setItem('ksp_lang', next);
+  };
 
   const handleCredentialResponse = useCallback(async (response: any) => {
     setLoading(true);
@@ -190,6 +208,19 @@ export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps)
           <div className="logo-pulse" style={{ width: 82, height: 82, margin: '0 auto 14px', borderRadius: 22, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, boxShadow: '0 0 0 10px rgba(99,102,241,.12),0 0 0 20px rgba(99,102,241,.06),0 20px 50px rgba(99,102,241,.4)' }}>
             📚
           </div>
+          {/* Language toggle on login */}
+          <div style={{ display:'flex', justifyContent:'center', gap:8, marginBottom:8 }}>
+            {(['en','kn'] as const).map(l => (
+              <button key={l} onClick={() => { setLoginLang(l); localStorage.setItem('ksp_lang',l); }}
+                style={{ padding:'5px 16px', borderRadius:20, border:'1.5px solid', cursor:'pointer', fontSize:13, fontWeight:700, fontFamily:'inherit', transition:'all 0.2s',
+                  borderColor: loginLang===l ? '#818cf8' : 'rgba(255,255,255,.15)',
+                  background: loginLang===l ? 'rgba(99,102,241,.25)' : 'rgba(255,255,255,.04)',
+                  color: loginLang===l ? '#c7d2fe' : 'rgba(165,180,252,.5)',
+                }}>
+                {l === 'en' ? '🇬🇧 English' : '🇮🇳 ಕನ್ನಡ'}
+              </button>
+            ))}
+          </div>
           <div className="lbadge" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(99,102,241,.15)', border: '1px solid rgba(99,102,241,.3)', borderRadius: 99, padding: '4px 14px' }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399' }} />
             <span style={{ color: '#a5b4fc', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>KSP PC MASTERY</span>
@@ -199,14 +230,14 @@ export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps)
         {/* Title */}
         <div className="la2" style={{ marginBottom: 6 }}>
           <h1 style={{ color: '#fff', fontSize: 30, fontWeight: 900, letterSpacing: -.5, margin: 0, lineHeight: 1.15 }}>
-            Welcome to{' '}
+            {loginLang === 'kn' ? 'ಸ್ವಾಗತ — ' : 'Welcome to '}
             <span style={{ background: 'linear-gradient(90deg,#818cf8,#c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              KSP PC
+              {L.title}
             </span>
           </h1>
         </div>
         <div className="la3" style={{ marginBottom: 28 }}>
-          <p style={{ color: 'rgba(165,180,252,.6)', fontSize: 13, margin: 0 }}>5,799 PYQs · Real solutions · Track progress</p>
+          <p style={{ color: 'rgba(165,180,252,.6)', fontSize: 13, margin: 0 }}>{L.sub}</p>
         </div>
 
         {/* Card */}
@@ -215,12 +246,12 @@ export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps)
           {loading || guestLoading ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '24px 16px', color: '#a5b4fc', fontSize: 14, fontWeight: 600 }}>
               <div style={{ width: 18, height: 18, border: '2.5px solid rgba(165,180,252,.3)', borderTop: '2.5px solid #a5b4fc', borderRadius: '50%', animation: 'spin .7s linear infinite' }} />
-              {guestLoading ? 'Entering as Guest…' : 'Signing you in…'}
+              {guestLoading ? L.entering : L.signing}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
               <p style={{ color: 'rgba(165,180,252,.8)', fontSize: 13, fontWeight: 600, margin: '0 0 4px', textAlign: 'center' }}>
-                Sign in to sync across devices
+                {L.sync}
               </p>
 
               {error && (
@@ -263,12 +294,12 @@ export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps)
 
               {/* Guest Button */}
               <button className="guest-btn" onClick={handleGuestLogin}>
-                👤 Continue as Guest
-                <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(165,180,252,.45)', marginLeft: 2 }}>(no sign-in needed)</span>
+                {L.guest}
+                <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(165,180,252,.45)', marginLeft: 2 }}>{L.guestSub}</span>
               </button>
 
               <p style={{ color: 'rgba(165,180,252,.35)', fontSize: 11, margin: 0 }}>
-                🔒 Google login = cloud sync · Guest = local only
+                {L.local}
               </p>
             </div>
           )}
@@ -277,9 +308,9 @@ export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps)
         {/* Stats row */}
         <div className="la5" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
           {[
-            { v: '5,799', l: 'Total PYQs' },
-            { v: '4 Subjects', l: 'Full Syllabus' },
-            { v: '60+ Topics', l: 'Classified' },
+            { v: '2,499', l: loginLang==='kn' ? 'ಪ್ರಶ್ನೆಗಳು' : 'Real PYQs' },
+            { v: '4', l: loginLang==='kn' ? 'ವಿಷಯಗಳು' : 'Subjects' },
+            { v: '80+', l: loginLang==='kn' ? 'ವಿಷಯಾಂಶ' : 'Topics' },
           ].map(s => (
             <div key={s.l} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: 14, padding: '10px 8px' }}>
               <p style={{ color: '#c7d2fe', fontWeight: 800, fontSize: 13, margin: '0 0 2px' }}>{s.v}</p>
