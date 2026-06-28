@@ -2,9 +2,11 @@
 // Profile · Logout · App Download · Pattern Analysis · Admin ONLY for anandakiccha240@gmail.com
 import React, { useState, useEffect, useMemo } from 'react';
 import { useT } from '../lib/i18n';
-import { getOverallStats, getAllTests, getStreak, getSettings, saveSettings } from '../lib/storage';
+import { getOverallStats, getAllTests, getStreak, getSettings, saveSettings, getAllAnswered } from '../lib/storage';
 import { getLatestCutoff, getCutoffTrend } from '../lib/cutoffEngine';
 import { getPhysicalRequirements } from '../lib/physicalData';
+import { getAllUsersAdmin } from '../lib/userRegistry';
+import type { RegistryUser } from '../lib/userRegistry';
 import type { UserSettings } from '../lib/storage';
 
 interface UserProfile { name: string; email: string; avatar: string; }
@@ -33,35 +35,69 @@ const EXAM_PATTERN = [
 function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: UserProfile | null }) {
   const [pin,      setPin]      = useState('');
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('ksp_admin') === '1');
-  const [tab,      setTab]      = useState<'overview'|'users'|'content'|'settings'>('overview');
+  const [tab,      setTab]      = useState<'overview'|'users'|'analytics'|'content'|'settings'>('overview');
+  const [users,    setUsers]    = useState<RegistryUser[]>([]);
+  const [loading,  setLoading]  = useState(false);
+  const [userSearch, setUserSearch] = useState('');
 
-  const stats = useMemo(() => getOverallStats(), []);
-  const tests = useMemo(() => getAllTests(), []);
+  const stats  = useMemo(() => getOverallStats(), []);
+  const tests  = useMemo(() => getAllTests(), []);
   const streak = useMemo(() => getStreak(), []);
   const settings = useMemo(() => getSettings(), []);
+  const answered = useMemo(() => getAllAnswered(), []);
 
-  // Simulated platform stats from real local data
+  // Fetch all real users from Firestore
+  const fetchUsers = async () => {
+    setLoading(true);
+    try { setUsers(await getAllUsersAdmin()); }
+    catch { /* silent */ }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { if (unlocked) fetchUsers(); }, [unlocked]);
+
+  // Derived metrics
+  const today = new Date().toISOString().split('T')[0];
+  const week  = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
+  const todayActive  = users.filter(u => u.todayActive).length;
+  const newThisWeek  = users.filter(u => u.registeredAt && u.registeredAt.toDate().toISOString().split('T')[0] >= week).length;
+  const totalUsers   = users.length;
+
   const avgTestScore = tests.length
-    ? Math.round(tests.reduce((s, t) => s + (t.score / t.total) * 100, 0) / tests.length)
-    : 0;
+    ? Math.round(tests.reduce((s, t) => s + (t.score / t.total) * 100, 0) / tests.length) : 0;
 
-  const subjectBreakdown = useMemo(() => {
+  // Subject breakdown from answered questions
+  const subjBreakdown = useMemo(() => {
     const map: Record<string, { total: number; correct: number }> = {};
-    try {
-      const raw = JSON.parse(localStorage.getItem('ksp_answers') || '{}');
-      Object.entries(raw).forEach(([, v]: [string, any]) => {
-        const subj = v.subject || 'Unknown';
-        if (!map[subj]) map[subj] = { total: 0, correct: 0 };
-        map[subj].total++;
-        if (v.correct) map[subj].correct++;
-      });
-    } catch { /* */ }
-    return Object.entries(map).map(([subj, d]) => ({
-      subj,
-      total: d.total,
-      acc: d.total > 0 ? Math.round((d.correct / d.total) * 100) : 0,
-    })).sort((a, b) => b.total - a.total);
-  }, []);
+    Object.values(answered).forEach((a: any) => {
+      const subj = a.subject || 'Unknown';
+      if (!map[subj]) map[subj] = { total: 0, correct: 0 };
+      map[subj].total++;
+      if (a.correct) map[subj].correct++;
+    });
+    return Object.entries(map)
+      .map(([subj, d]) => ({ subj, total: d.total, acc: d.total > 0 ? Math.round((d.correct/d.total)*100) : 0 }))
+      .sort((a,b) => b.total - a.total);
+  }, [answered]);
+
+  // Category distribution of all registered users
+  const catDist = useMemo(() => {
+    const m: Record<string,number> = {};
+    users.forEach(u => { m[u.category||'General'] = (m[u.category||'General']||0)+1; });
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+  }, [users]);
+
+  const regionDist = useMemo(() => {
+    const m: Record<string,number> = {};
+    users.forEach(u => { m[u.region||'NKK'] = (m[u.region||'NKK']||0)+1; });
+    return Object.entries(m);
+  }, [users]);
+
+  const genderDist = useMemo(() => {
+    let m = 0, f = 0;
+    users.forEach(u => { if(u.gender==='F') f++; else m++; });
+    return { m, f };
+  }, [users]);
 
   const tryUnlock = () => {
     if (pin === '2024ksp') { sessionStorage.setItem('ksp_admin', '1'); setUnlocked(true); }
@@ -70,294 +106,343 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
 
   if (!unlocked) {
     return (
-      <div className="page" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <div style={{ width: '100%', maxWidth: 380 }}>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--c-primary)', fontWeight: 700, fontSize: 14, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 6 }}>
-            ← Back
-          </button>
-          <div style={{ textAlign: 'center', padding: '32px 24px', background: 'var(--c-surface)', border: '1.5px solid var(--c-border)', borderRadius: 20, boxShadow: 'var(--shadow-md)' }}>
-            <div style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg,#1565C0,#0D47A1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 34, boxShadow: '0 8px 24px rgba(21,101,192,.35)' }}>🛡️</div>
-            <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 4 }}>Admin Dashboard</div>
-            <div style={{ fontSize: 13, color: 'var(--c-text-3)', marginBottom: 20 }}>Access restricted to <strong>{ADMIN_EMAIL}</strong></div>
+      <div className="page" style={{ minHeight:'100dvh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:24 }}>
+        <div style={{ width:'100%', maxWidth:380 }}>
+          <button onClick={onBack} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--c-primary)', fontWeight:700, fontSize:14, marginBottom:20 }}>← Back</button>
+          <div style={{ textAlign:'center', padding:'32px 24px', background:'var(--c-surface)', border:'1.5px solid var(--c-border)', borderRadius:20, boxShadow:'var(--shadow-md)' }}>
+            <div style={{ width:72, height:72, borderRadius:20, background:'linear-gradient(135deg,#1565C0,#0D47A1)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', fontSize:34 }}>🛡️</div>
+            <div style={{ fontWeight:800, fontSize:20, marginBottom:4 }}>Admin Dashboard</div>
+            <div style={{ fontSize:13, color:'var(--c-text-3)', marginBottom:20 }}>Restricted to <strong>{ADMIN_EMAIL}</strong></div>
             <input type="password" value={pin}
               onChange={e => setPin(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && tryUnlock()}
-              placeholder="Enter Admin PIN"
-              style={{ width: '100%', padding: '14px 16px', borderRadius: 12, border: '2px solid var(--c-border)', fontSize: 18, textAlign: 'center', marginBottom: 12, letterSpacing: 8, outline: 'none', fontFamily: 'monospace' }}
+              onKeyDown={e => e.key==='Enter' && tryUnlock()}
+              placeholder="Enter PIN — 2024ksp"
+              style={{ width:'100%', padding:'14px 16px', borderRadius:12, border:'2px solid var(--c-border)', fontSize:18, textAlign:'center', marginBottom:12, letterSpacing:8, outline:'none', fontFamily:'monospace' }}
               autoFocus
             />
-            <button className="btn btn-primary btn-block" onClick={tryUnlock} style={{ fontSize: 15, padding: '13px' }}>
-              🔓 Unlock Admin Panel
-            </button>
+            <button className="btn btn-primary btn-block" onClick={tryUnlock} style={{ fontSize:15, padding:'13px' }}>🔓 Unlock</button>
           </div>
         </div>
       </div>
     );
   }
 
+  const filteredUsers = userSearch.trim()
+    ? users.filter(u => u.name.toLowerCase().includes(userSearch.toLowerCase()) || u.email.toLowerCase().includes(userSearch.toLowerCase()))
+    : users;
+
   return (
-    <div>
-      {/* Admin topbar */}
-      <div style={{
-        background: 'linear-gradient(135deg,#0D47A1,#1565C0)',
-        padding: '14px 16px',
-        display: 'flex', alignItems: 'center', gap: 10,
-        position: 'sticky', top: 0, zIndex: 50,
-      }}>
-        <button onClick={onBack}
-          style={{ background: 'rgba(255,255,255,.15)', border: 'none', borderRadius: 8, padding: '6px 12px', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-          ← Back
-        </button>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 800, fontSize: 16, color: '#fff' }}>🛡️ Admin Dashboard</div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,.7)' }}>{ADMIN_EMAIL}</div>
+    <div style={{ background:'var(--c-surface)', minHeight:'100dvh' }}>
+
+      {/* ── Admin top bar ── */}
+      <div style={{ background:'linear-gradient(135deg,#0D47A1,#1565C0)', padding:'14px 16px', display:'flex', alignItems:'center', gap:10, position:'sticky', top:0, zIndex:100, boxShadow:'0 4px 16px rgba(13,71,161,.4)' }}>
+        <button onClick={onBack} style={{ background:'rgba(255,255,255,.15)', border:'none', borderRadius:8, padding:'6px 12px', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>← Back</button>
+        <div style={{ flex:1 }}>
+          <div style={{ fontWeight:800, fontSize:16, color:'#fff' }}>🛡️ Admin Dashboard</div>
+          <div style={{ fontSize:10, color:'rgba(255,255,255,.65)' }}>{ADMIN_EMAIL}</div>
         </div>
-        <button
-          onClick={() => { sessionStorage.removeItem('ksp_admin'); setUnlocked(false); }}
-          style={{ background: 'rgba(255,0,0,.2)', border: '1px solid rgba(255,0,0,.4)', borderRadius: 8, padding: '5px 10px', color: '#FECACA', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
-          Lock
-        </button>
+        <button onClick={fetchUsers} style={{ background:'rgba(255,255,255,.15)', border:'none', borderRadius:8, padding:'6px 10px', color:'#fff', fontSize:12, cursor:'pointer', fontWeight:700 }}>🔄 Refresh</button>
+        <button onClick={() => { sessionStorage.removeItem('ksp_admin'); setUnlocked(false); }} style={{ background:'rgba(255,0,0,.2)', border:'1px solid rgba(255,0,0,.4)', borderRadius:8, padding:'5px 10px', color:'#FECACA', fontSize:11, cursor:'pointer', fontWeight:700 }}>🔒</button>
       </div>
 
       <div className="page page-gap">
 
-        {/* ── Overview cards ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {/* ── TOP KPI CARDS ── */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:10 }}>
           {[
-            { icon: '📚', val: stats.total,          label: 'Qs Attempted', color: '#1565C0', bg: '#EFF6FF' },
-            { icon: '🎯', val: `${stats.accuracy}%`,  label: 'Avg Accuracy',  color: '#16A34A', bg: '#F0FDF4' },
-            { icon: '📝', val: tests.length,          label: 'Tests Taken',   color: '#7C3AED', bg: '#FAF5FF' },
-            { icon: '🔥', val: streak.current,        label: 'Day Streak',    color: '#EA580C', bg: '#FFF7ED' },
-          ].map(({ icon, val, label, color, bg }) => (
-            <div key={label} style={{ background: bg, border: `1.5px solid ${color}30`, borderRadius: 14, padding: '14px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 26 }}>{icon}</span>
+            { icon:'👥', val: loading ? '…' : totalUsers,   label:'Total Users',   color:'#1565C0', bg:'#EFF6FF', border:'#BFDBFE' },
+            { icon:'🟢', val: loading ? '…' : todayActive,  label:'Active Today',  color:'#16A34A', bg:'#F0FDF4', border:'#BBF7D0' },
+            { icon:'🆕', val: loading ? '…' : newThisWeek,  label:'New (7 days)',  color:'#7C3AED', bg:'#FAF5FF', border:'#E9D5FF' },
+            { icon:'🔥', val: streak.current,               label:'Your Streak',   color:'#EA580C', bg:'#FFF7ED', border:'#FED7AA' },
+          ].map(({ icon, val, label, color, bg, border }) => (
+            <div key={label} style={{ background:bg, border:`1.5px solid ${border}`, borderRadius:14, padding:'14px 12px', display:'flex', alignItems:'center', gap:10 }}>
+              <span style={{ fontSize:28 }}>{icon}</span>
               <div>
-                <div style={{ fontWeight: 900, fontSize: 22, color, lineHeight: 1 }}>{val}</div>
-                <div style={{ fontSize: 11, color, fontWeight: 700, marginTop: 2, opacity: 0.8 }}>{label}</div>
+                <div style={{ fontWeight:900, fontSize:26, color, lineHeight:1 }}>{val}</div>
+                <div style={{ fontSize:11, color, fontWeight:700, marginTop:2, opacity:.8 }}>{label}</div>
               </div>
             </div>
           ))}
         </div>
 
         {/* ── Tab nav ── */}
-        <div className="inner-tabs">
+        <div style={{ display:'flex', gap:6, overflowX:'auto', paddingBottom:2 }}>
           {([
-            ['overview', '📊 Overview'],
-            ['users',    '👤 User'],
-            ['content',  '📚 Content'],
-            ['settings', '⚙️ Config'],
+            ['overview',  '📊 Overview'],
+            ['users',     '👥 Users'],
+            ['analytics', '📈 Analytics'],
+            ['content',   '📚 Content'],
+            ['settings',  '⚙️ Config'],
           ] as const).map(([t, l]) => (
-            <button key={t} className={`inner-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>{l}</button>
+            <button key={t}
+              onClick={() => setTab(t)}
+              style={{ whiteSpace:'nowrap', padding:'7px 14px', borderRadius:20, border:`1.5px solid ${tab===t ? 'var(--c-primary)' : 'var(--c-border)'}`, background:tab===t ? 'var(--c-primary)' : 'none', color:tab===t ? '#fff' : 'var(--c-text-2)', fontWeight:700, fontSize:12, cursor:'pointer', flexShrink:0 }}>
+              {l}
+            </button>
           ))}
         </div>
 
-        {/* ══ OVERVIEW TAB ══ */}
+        {/* ══════════════ OVERVIEW TAB ══════════════ */}
         {tab === 'overview' && (
           <>
-            {/* Score analysis */}
+            {/* Score bar chart */}
             <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>📈 Test Score Analysis</div>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:10 }}>📈 Your Mock Test Scores</div>
               {tests.length === 0
-                ? <div style={{ textAlign: 'center', color: 'var(--c-text-3)', padding: '20px 0', fontSize: 13 }}>No tests taken yet</div>
-                : (
-                  <>
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                ? <div style={{ textAlign:'center', color:'var(--c-text-3)', padding:'20px 0', fontSize:13 }}>No tests yet</div>
+                : <>
+                    <div style={{ display:'flex', gap:8, marginBottom:12 }}>
                       {[
-                        { label: 'Best Score',  val: `${Math.max(...tests.map(t => Math.round((t.score/t.total)*100)))}%`, color: '#16A34A' },
-                        { label: 'Avg Score',   val: `${avgTestScore}%`,  color: '#1565C0' },
-                        { label: 'Latest',      val: `${Math.round((tests[0].score/tests[0].total)*100)}%`, color: '#7C3AED' },
-                      ].map(({ label, val, color }) => (
-                        <div key={label} style={{ flex: 1, textAlign: 'center', background: 'var(--c-surface-2)', borderRadius: 10, padding: '10px 6px' }}>
-                          <div style={{ fontWeight: 900, fontSize: 20, color }}>{val}</div>
-                          <div style={{ fontSize: 10, color: 'var(--c-text-3)', fontWeight: 700, marginTop: 2 }}>{label}</div>
+                        { label:'Best',    val:`${Math.max(...tests.map(t=>Math.round((t.score/t.total)*100)))}%`, color:'#16A34A' },
+                        { label:'Average', val:`${avgTestScore}%`, color:'#1565C0' },
+                        { label:'Latest',  val:`${Math.round((tests[0].score/tests[0].total)*100)}%`, color:'#7C3AED' },
+                      ].map(({label,val,color}) => (
+                        <div key={label} style={{ flex:1, textAlign:'center', background:'var(--c-surface-2)', borderRadius:10, padding:'10px 6px' }}>
+                          <div style={{ fontWeight:900, fontSize:20, color }}>{val}</div>
+                          <div style={{ fontSize:10, color:'var(--c-text-3)', fontWeight:700, marginTop:2 }}>{label}</div>
                         </div>
                       ))}
                     </div>
-                    {/* Mini bar chart of last 5 tests */}
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--c-text-3)', marginBottom: 6 }}>LAST 5 TESTS</div>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 60 }}>
-                      {tests.slice(0, 5).reverse().map((t, i) => {
-                        const pct = Math.round((t.score / t.total) * 100);
+                    <div style={{ fontSize:11, fontWeight:700, color:'var(--c-text-3)', marginBottom:6 }}>LAST {Math.min(tests.length,8)} TESTS</div>
+                    <div style={{ display:'flex', gap:5, alignItems:'flex-end', height:70 }}>
+                      {tests.slice(0,8).reverse().map((t,i) => {
+                        const pct = Math.round((t.score/t.total)*100);
+                        const c   = pct>=70 ? '#16A34A' : pct>=50 ? '#D97706' : '#DC2626';
                         return (
-                          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                            <div style={{ fontSize: 9, fontWeight: 700, color: pct >= 70 ? '#16A34A' : pct >= 50 ? '#D97706' : '#DC2626' }}>{pct}%</div>
-                            <div style={{ width: '100%', height: `${Math.max(8, pct * 0.44)}px`, borderRadius: 4, background: pct >= 70 ? '#16A34A' : pct >= 50 ? '#D97706' : '#DC2626', transition: 'height .3s ease' }} />
+                          <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:3 }}>
+                            <div style={{ fontSize:9, fontWeight:700, color:c }}>{pct}%</div>
+                            <div style={{ width:'100%', height:`${Math.max(8,pct*0.6)}px`, borderRadius:4, background:c }} />
                           </div>
                         );
                       })}
                     </div>
                   </>
-                )}
+              }
             </div>
 
-            {/* Subject performance */}
-            {subjectBreakdown.length > 0 && (
+            {/* Subject accuracy */}
+            {subjBreakdown.length > 0 && (
               <div className="card">
-                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>🎯 Subject-wise Performance</div>
-                {subjectBreakdown.map(({ subj, total, acc }) => (
-                  <div key={subj} style={{ marginBottom: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600 }}>{subj}</span>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: acc >= 70 ? '#16A34A' : acc >= 50 ? '#D97706' : '#DC2626' }}>{acc}% · {total} Qs</span>
+                <div style={{ fontWeight:700, fontSize:14, marginBottom:10 }}>🎯 Subject Accuracy</div>
+                {subjBreakdown.slice(0,5).map(({subj,total,acc}) => (
+                  <div key={subj} style={{ marginBottom:10 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+                      <span style={{ fontSize:13, fontWeight:600 }}>{subj}</span>
+                      <span style={{ fontSize:12, fontWeight:800, color:acc>=70?'#16A34A':acc>=50?'#D97706':'#DC2626' }}>{acc}% · {total}Qs</span>
                     </div>
-                    <div className="progress-bar" style={{ height: 6 }}>
-                      <div className="progress-fill" style={{ width: `${acc}%`, background: acc >= 70 ? '#16A34A' : acc >= 50 ? '#D97706' : '#DC2626' }} />
+                    <div className="progress-bar" style={{ height:6 }}>
+                      <div className="progress-fill" style={{ width:`${acc}%`, background:acc>=70?'#16A34A':acc>=50?'#D97706':'#DC2626' }} />
                     </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Activity heatmap */}
+            {/* Heatmap */}
             <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>📅 Study Activity (Last 52 days)</div>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:10 }}>📅 Activity (52 days)</div>
               <div className="heatmap-grid">
-                {Array.from({ length: 52 }, (_, i) => {
-                  const d = new Date(); d.setDate(d.getDate() - (51 - i));
-                  const str   = d.toISOString().split('T')[0];
-                  const today = str === new Date().toISOString().split('T')[0];
+                {Array.from({length:52},(_,i) => {
+                  const d = new Date(); d.setDate(d.getDate()-(51-i));
+                  const str = d.toISOString().split('T')[0];
+                  const isToday = str===today;
                   const active = streak.days?.includes(str);
-                  return <div key={str} className={`heatmap-cell${active ? ' active' : ''}${today ? ' today' : ''}`} title={str} />;
+                  return <div key={str} className={`heatmap-cell${active?' active':''}${isToday?' today':''}`} title={str} />;
                 })}
               </div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 10, flexWrap: 'wrap', fontSize: 11, color: 'var(--c-text-3)' }}>
-                <span>🔥 Current streak: <strong style={{ color: 'var(--c-primary)' }}>{streak.current} days</strong></span>
-                <span>🏆 Best: <strong>{streak.best} days</strong></span>
+              <div style={{ display:'flex', gap:12, marginTop:8, fontSize:11, color:'var(--c-text-3)' }}>
+                <span>🔥 Streak: <strong style={{ color:'var(--c-primary)' }}>{streak.current}d</strong></span>
+                <span>🏆 Best: <strong>{streak.best}d</strong></span>
+                <span>📚 Total Qs: <strong>{stats.total}</strong></span>
               </div>
             </div>
           </>
         )}
 
-        {/* ══ USER TAB ══ */}
+        {/* ══════════════ USERS TAB ══════════════ */}
         {tab === 'users' && (
           <>
-            {/* Logged-in user card */}
-            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-              <div style={{ background: 'linear-gradient(135deg,#1565C0,#0D47A1)', padding: '16px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.7)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active User</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  {profile?.avatar
-                    ? <img src={profile.avatar} style={{ width: 52, height: 52, borderRadius: '50%', border: '3px solid rgba(255,255,255,.4)' }} alt="" />
-                    : <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 900, color: '#fff' }}>{profile?.name?.[0] ?? '?'}</div>
-                  }
-                  <div>
-                    <div style={{ fontWeight: 800, fontSize: 18, color: '#fff' }}>{profile?.name ?? 'Guest'}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,.8)' }}>{profile?.email ?? 'Not signed in'}</div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#86EFAC', marginTop: 4, display: 'inline-block' }}>✓ Admin Access</span>
-                  </div>
+            {/* User summary strip */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
+              {[
+                { val:totalUsers,  label:'Registered', color:'#1565C0', bg:'#EFF6FF' },
+                { val:todayActive, label:'Today',       color:'#16A34A', bg:'#F0FDF4' },
+                { val:newThisWeek, label:'New 7d',      color:'#7C3AED', bg:'#FAF5FF' },
+              ].map(({val,label,color,bg}) => (
+                <div key={label} style={{ background:bg, borderRadius:12, padding:'10px 8px', textAlign:'center' }}>
+                  <div style={{ fontWeight:900, fontSize:22, color }}>{loading?'…':val}</div>
+                  <div style={{ fontSize:10, color, fontWeight:700, marginTop:2 }}>{label}</div>
                 </div>
+              ))}
+            </div>
+
+            {/* Search */}
+            <input
+              type="search" value={userSearch}
+              onChange={e => setUserSearch(e.target.value)}
+              placeholder="🔍 Search users by name / email…"
+              style={{ width:'100%', padding:'10px 14px', borderRadius:10, border:'1.5px solid var(--c-border)', fontSize:13, outline:'none', background:'var(--c-surface-2)' }}
+            />
+
+            {/* User list */}
+            <div className="card" style={{ padding:0, overflow:'hidden' }}>
+              <div style={{ padding:'12px 16px', borderBottom:'1px solid var(--c-border)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div style={{ fontWeight:700, fontSize:13 }}>All Users ({filteredUsers.length})</div>
+                <button onClick={fetchUsers} style={{ background:'none', border:'none', cursor:'pointer', fontSize:13, color:'var(--c-primary)', fontWeight:700 }}>
+                  {loading ? '⏳ Loading…' : '🔄 Refresh'}
+                </button>
               </div>
-              <div style={{ padding: '14px 16px' }}>
-                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10 }}>Exam Profile Saved</div>
+              {loading && <div style={{ textAlign:'center', padding:'24px 0', color:'var(--c-text-3)', fontSize:13 }}>Loading users from Firestore…</div>}
+              {!loading && filteredUsers.length === 0 && (
+                <div style={{ textAlign:'center', padding:'24px 0', color:'var(--c-text-3)', fontSize:13 }}>No users found</div>
+              )}
+              {!loading && filteredUsers.map((u, i) => {
+                const lastActive = u.lastActiveAt ? u.lastActiveAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}) : 'Never';
+                const regDate    = u.registeredAt  ? u.registeredAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'})  : '?';
+                return (
+                  <div key={u.uid} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:i<filteredUsers.length-1?'1px solid var(--c-border)':'none', background:u.todayActive?'rgba(22,163,74,.04)':'none' }}>
+                    {u.avatar
+                      ? <img src={u.avatar} style={{ width:44, height:44, borderRadius:'50%', border:`2px solid ${u.todayActive?'#16A34A':'var(--c-border)'}`, flexShrink:0 }} alt="" />
+                      : <div style={{ width:44, height:44, borderRadius:'50%', background:'linear-gradient(135deg,#1565C0,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:900, fontSize:18, flexShrink:0 }}>{u.name[0]}</div>
+                    }
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap' }}>
+                        <span style={{ fontWeight:700, fontSize:14, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{u.name}</span>
+                        {u.todayActive && <span style={{ fontSize:10, background:'#DCFCE7', color:'#16A34A', borderRadius:20, padding:'1px 8px', fontWeight:700, flexShrink:0 }}>● ACTIVE</span>}
+                        {u.email === ADMIN_EMAIL && <span style={{ fontSize:10, background:'#DBEAFE', color:'#1565C0', borderRadius:20, padding:'1px 8px', fontWeight:700, flexShrink:0 }}>🛡️ Admin</span>}
+                      </div>
+                      <div style={{ fontSize:11, color:'var(--c-text-3)', marginTop:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{u.email}</div>
+                      <div style={{ display:'flex', gap:8, marginTop:4, flexWrap:'wrap' }}>
+                        <span style={{ fontSize:10, background:'var(--c-surface-2)', borderRadius:6, padding:'2px 6px', color:'var(--c-text-3)' }}>{u.category?.replace(/_/g,' ')||'General'}</span>
+                        <span style={{ fontSize:10, background:'var(--c-surface-2)', borderRadius:6, padding:'2px 6px', color:'var(--c-text-3)' }}>{u.region||'NKK'}</span>
+                        <span style={{ fontSize:10, background:'var(--c-surface-2)', borderRadius:6, padding:'2px 6px', color:'var(--c-text-3)' }}>{u.gender==='F'?'Female':'Male'}</span>
+                      </div>
+                    </div>
+                    <div style={{ textAlign:'right', flexShrink:0, fontSize:10, color:'var(--c-text-4)', lineHeight:1.8 }}>
+                      <div>📅 Joined: {regDate}</div>
+                      <div>⏰ Last: {lastActive}</div>
+                      <div>🔄 Sessions: {u.totalSessions}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {/* ══════════════ ANALYTICS TAB ══════════════ */}
+        {tab === 'analytics' && (
+          <>
+            {/* Category distribution */}
+            <div className="card">
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>📊 Users by Category</div>
+              {catDist.length === 0
+                ? <div style={{ color:'var(--c-text-3)', fontSize:13 }}>No data yet</div>
+                : catDist.map(([cat, count]) => (
+                    <div key={cat} style={{ marginBottom:10 }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+                        <span style={{ fontSize:13, fontWeight:600 }}>{cat.replace(/_/g,' ')}</span>
+                        <span style={{ fontSize:12, fontWeight:800, color:'var(--c-primary)' }}>{count} users · {totalUsers>0?Math.round((count/totalUsers)*100):0}%</span>
+                      </div>
+                      <div className="progress-bar" style={{ height:8 }}>
+                        <div className="progress-fill" style={{ width:`${totalUsers>0?(count/totalUsers)*100:0}%`, background:'var(--c-primary)' }} />
+                      </div>
+                    </div>
+                  ))
+              }
+            </div>
+
+            {/* Region + Gender */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+              <div className="card">
+                <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>🗺️ Region</div>
+                {regionDist.map(([r,c]) => (
+                  <div key={r} style={{ display:'flex', justifyContent:'space-between', padding:'5px 0', borderBottom:'1px solid var(--c-border)', fontSize:13 }}>
+                    <span style={{ color:'var(--c-text-2)' }}>{r}</span>
+                    <strong style={{ color:'var(--c-primary)' }}>{c}</strong>
+                  </div>
+                ))}
+              </div>
+              <div className="card">
+                <div style={{ fontWeight:700, fontSize:13, marginBottom:10 }}>👤 Gender</div>
                 {[
-                  { label: 'Category', val: settings.category.replace(/_/g, ' ') },
-                  { label: 'Region',   val: settings.region },
-                  { label: 'Gender',   val: settings.gender === 'M' ? 'Male' : 'Female' },
-                ].map(({ label, val }) => (
-                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--c-border)', fontSize: 13 }}>
-                    <span style={{ color: 'var(--c-text-3)' }}>{label}</span>
-                    <strong style={{ color: 'var(--c-primary)' }}>{val}</strong>
+                  { label:'Male',   val:genderDist.m, color:'#1565C0' },
+                  { label:'Female', val:genderDist.f, color:'#EC4899' },
+                ].map(({label,val,color}) => (
+                  <div key={label} style={{ display:'flex', justifyContent:'space-between', padding:'5px 0', borderBottom:'1px solid var(--c-border)', fontSize:13 }}>
+                    <span style={{ color:'var(--c-text-2)' }}>{label}</span>
+                    <strong style={{ color }}>{val}</strong>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* User stats detailed */}
+            {/* Engagement */}
             <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>📊 Detailed Stats</div>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>📈 Engagement Metrics</div>
               {[
-                { label: 'Total Questions Attempted', val: stats.total,     icon: '📚' },
-                { label: 'Correct Answers',           val: stats.correct,   icon: '✅' },
-                { label: 'Wrong Answers',             val: stats.wrong,     icon: '❌' },
-                { label: 'Accuracy Rate',             val: `${stats.accuracy}%`, icon: '🎯' },
-                { label: 'Tests Completed',           val: tests.length,    icon: '📝' },
-                { label: 'Study Streak',              val: `${streak.current} days`, icon: '🔥' },
-                { label: 'Best Streak',               val: `${streak.best} days`,    icon: '🏆' },
-              ].map(({ label, val, icon }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--c-border)' }}>
-                  <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
-                  <span style={{ flex: 1, fontSize: 13, color: 'var(--c-text-2)' }}>{label}</span>
-                  <strong style={{ fontSize: 14 }}>{val}</strong>
+                { label:'Avg sessions/user',  val: totalUsers>0 ? (users.reduce((s,u)=>s+u.totalSessions,0)/totalUsers).toFixed(1) : '—', icon:'🔄' },
+                { label:'Daily active rate',  val: totalUsers>0 ? `${Math.round((todayActive/totalUsers)*100)}%` : '—', icon:'🟢' },
+                { label:'Retention (7d)',     val: totalUsers>0 ? `${Math.round((newThisWeek/Math.max(totalUsers,1))*100)}%` : '—', icon:'📌' },
+                { label:'Your Questions',     val: stats.total,  icon:'📚' },
+                { label:'Your Accuracy',      val: `${stats.accuracy}%`, icon:'🎯' },
+                { label:'Your Tests',         val: tests.length, icon:'📝' },
+              ].map(({label,val,icon}) => (
+                <div key={label} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', borderBottom:'1px solid var(--c-border)' }}>
+                  <span style={{ fontSize:18, flexShrink:0 }}>{icon}</span>
+                  <span style={{ flex:1, fontSize:13, color:'var(--c-text-2)' }}>{label}</span>
+                  <strong style={{ fontSize:14, color:'var(--c-primary)' }}>{val}</strong>
                 </div>
               ))}
-            </div>
-
-            {/* Recent tests */}
-            <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>Recent Mock Tests</div>
-              {tests.length === 0
-                ? <div style={{ textAlign: 'center', color: 'var(--c-text-3)', padding: '16px 0', fontSize: 13 }}>No tests yet</div>
-                : tests.slice(0, 8).map((t, i) => {
-                    const pct  = Math.round((t.score / t.total) * 100);
-                    const date = new Date(t.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' });
-                    return (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--c-border)' }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14,
-                          background: pct >= 70 ? '#DCFCE7' : pct >= 50 ? '#FFFBEB' : '#FEF2F2',
-                          color:      pct >= 70 ? '#16A34A' : pct >= 50 ? '#D97706' : '#DC2626',
-                        }}>
-                          {pct}%
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.label}</div>
-                          <div style={{ fontSize: 11, color: 'var(--c-text-3)' }}>{date} · Score: {t.score.toFixed(0)}/{t.total}</div>
-                        </div>
-                      </div>
-                    );
-                  })
-              }
             </div>
           </>
         )}
 
-        {/* ══ CONTENT TAB ══ */}
+        {/* ══════════════ CONTENT TAB ══════════════ */}
         {tab === 'content' && (
           <>
             <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>📦 Database Stats</div>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>📦 App Database</div>
               {[
-                { label: 'Total PYQ Questions', val: '2,499', icon: '📚', color: '#1565C0' },
-                { label: 'With Kannada Trans.',  val: '2,499 (100%)', icon: '🇮🇳', color: '#16A34A' },
-                { label: 'Years Covered',        val: '2014–2024',    icon: '📅', color: '#7C3AED' },
-                { label: 'Subjects',             val: '4',            icon: '🔬', color: '#D97706' },
-                { label: 'Topics / Chapters',    val: '80+',          icon: '📖', color: '#EA580C' },
-                { label: 'Mock Test Templates',  val: '5 types',      icon: '📝', color: '#0EA5E9' },
-              ].map(({ label, val, icon, color }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--c-border)' }}>
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>{icon}</span>
-                  <span style={{ flex: 1, fontSize: 13, color: 'var(--c-text-2)' }}>{label}</span>
-                  <strong style={{ color, fontSize: 13 }}>{val}</strong>
+                { label:'Total PYQ Questions', val:'2,499',       icon:'📚', color:'#1565C0' },
+                { label:'With Kannada Trans.',  val:'100%',        icon:'🇮🇳', color:'#16A34A' },
+                { label:'Years Covered',        val:'2014–2024',   icon:'📅', color:'#7C3AED' },
+                { label:'Subjects',             val:'4',           icon:'🔬', color:'#D97706' },
+                { label:'Topics',               val:'80+',         icon:'📖', color:'#EA580C' },
+                { label:'Mock Test Types',      val:'5',           icon:'📝', color:'#0EA5E9' },
+              ].map(({label,val,icon,color}) => (
+                <div key={label} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', borderBottom:'1px solid var(--c-border)' }}>
+                  <span style={{ fontSize:20, flexShrink:0 }}>{icon}</span>
+                  <span style={{ flex:1, fontSize:13, color:'var(--c-text-2)' }}>{label}</span>
+                  <strong style={{ color, fontSize:13 }}>{val}</strong>
                 </div>
               ))}
             </div>
-
             <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>📊 Subject Distribution</div>
-              {EXAM_PATTERN.map(({ subject, weight, color, emoji }) => (
-                <div key={subject} style={{ marginBottom: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600 }}>{emoji} {subject}</span>
-                    <span style={{ fontWeight: 800, color, fontSize: 14 }}>{weight} marks</span>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>📊 Subject Distribution</div>
+              {EXAM_PATTERN.map(({subject,weight,color,emoji}) => (
+                <div key={subject} style={{ marginBottom:10 }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+                    <span style={{ fontSize:13, fontWeight:600 }}>{emoji} {subject}</span>
+                    <span style={{ fontWeight:800, color }}>{weight} marks</span>
                   </div>
-                  <div className="progress-bar" style={{ height: 8 }}>
-                    <div className="progress-fill" style={{ width: `${weight}%`, background: color }} />
-                  </div>
+                  <div className="progress-bar" style={{ height:8 }}><div className="progress-fill" style={{ width:`${weight}%`, background:color }} /></div>
                 </div>
               ))}
             </div>
-
-            <div className="card" style={{ background: 'var(--c-surface-2)' }}>
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>🌐 App Info</div>
+            <div className="card" style={{ background:'var(--c-surface-2)' }}>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:10 }}>🌐 Technical Info</div>
               {[
-                { label: 'Version',     val: 'v2.0 (2025)' },
-                { label: 'Framework',  val: 'React + Vite PWA' },
-                { label: 'Deployment', val: 'Vercel (karnataka-pc-app.vercel.app)' },
-                { label: 'Offline',    val: 'Yes — Service Worker cached' },
-                { label: 'Languages',  val: 'English + ಕನ್ನಡ' },
-                { label: 'Developer',  val: 'Ananda Valmiki' },
-              ].map(({ label, val }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--c-border)', fontSize: 13 }}>
-                  <span style={{ color: 'var(--c-text-3)' }}>{label}</span>
+                { label:'Framework',  val:'React 18 + Vite + PWA' },
+                { label:'Database',   val:'Firestore (Firebase)' },
+                { label:'Auth',       val:'Google Sign-In (GIS)' },
+                { label:'Hosting',    val:'Vercel Edge' },
+                { label:'Offline',    val:'Service Worker + Cache' },
+                { label:'Version',    val:'v2.0 · 2025' },
+                { label:'Developer',  val:'Ananda Valmiki' },
+              ].map(({label,val}) => (
+                <div key={label} style={{ display:'flex', justifyContent:'space-between', padding:'7px 0', borderBottom:'1px solid var(--c-border)', fontSize:13 }}>
+                  <span style={{ color:'var(--c-text-3)' }}>{label}</span>
                   <strong>{val}</strong>
                 </div>
               ))}
@@ -365,36 +450,32 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
           </>
         )}
 
-        {/* ══ SETTINGS TAB ══ */}
+        {/* ══════════════ CONFIG TAB ══════════════ */}
         {tab === 'settings' && (
           <>
             <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>⚙️ Admin Configuration</div>
-              <div style={{ fontSize: 13, color: 'var(--c-text-2)', lineHeight: 2 }}>
-                <div>Admin Email: <strong style={{ color: 'var(--c-primary)' }}>{ADMIN_EMAIL}</strong></div>
-                <div>Admin PIN: <strong style={{ fontFamily: 'monospace', background: 'var(--c-surface-2)', padding: '1px 8px', borderRadius: 4 }}>2024ksp</strong></div>
-                <div>Session: <strong style={{ color: '#16A34A' }}>Active</strong></div>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:12 }}>⚙️ Admin Config</div>
+              <div style={{ fontSize:13, color:'var(--c-text-2)', lineHeight:2 }}>
+                <div>Email: <strong style={{ color:'var(--c-primary)' }}>{ADMIN_EMAIL}</strong></div>
+                <div>PIN: <strong style={{ fontFamily:'monospace', background:'var(--c-surface-2)', padding:'1px 8px', borderRadius:4 }}>2024ksp</strong></div>
+                <div>Firestore: <strong style={{ color:'#16A34A' }}>kps-pc-70582</strong></div>
+                <div>Collection: <strong>ksp_users</strong></div>
               </div>
             </div>
-
             <div className="card">
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>🗑️ Data Management</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontWeight:700, fontSize:14, marginBottom:10 }}>🗑️ Data Management</div>
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
                 <button className="btn btn-outline btn-block"
-                  onClick={() => { const d = JSON.stringify(localStorage); const a = document.createElement('a'); a.href = 'data:text/json,' + encodeURIComponent(d); a.download = 'ksp_backup.json'; a.click(); }}>
-                  📥 Export All Data (JSON)
+                  onClick={() => { const d=JSON.stringify({...localStorage}); const a=document.createElement('a'); a.href='data:text/json,'+encodeURIComponent(d); a.download='ksp_admin_export.json'; a.click(); }}>
+                  📥 Export My Data (JSON)
                 </button>
                 <button className="btn btn-danger btn-block"
-                  onClick={() => { if (confirm('⚠️ This will DELETE all user data permanently. Are you sure?')) { localStorage.clear(); window.location.reload(); } }}>
-                  🗑️ Reset All User Data
+                  onClick={() => { if(confirm('⚠️ DELETE all LOCAL data?')) { localStorage.clear(); window.location.reload(); } }}>
+                  🗑️ Reset Local Data
                 </button>
               </div>
             </div>
-
-            <button className="btn btn-ghost btn-block"
-              onClick={() => { sessionStorage.removeItem('ksp_admin'); setUnlocked(false); }}>
-              🔒 Lock Admin Panel
-            </button>
+            <button className="btn btn-ghost btn-block" onClick={() => { sessionStorage.removeItem('ksp_admin'); setUnlocked(false); }}>🔒 Lock Admin Panel</button>
           </>
         )}
 

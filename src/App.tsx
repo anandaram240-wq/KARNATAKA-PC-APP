@@ -10,6 +10,8 @@ import PracticeView from './components/PracticeView';
 import MockTestView from './components/MockTestView';
 import InsightsView from './components/InsightsView';
 import ProfileView from './components/ProfileView';
+import { registerUserActivity } from './lib/userRegistry';
+import { getSettings } from './lib/storage';
 
 type Tab = 'home' | 'practice' | 'test' | 'insights' | 'profile';
 
@@ -82,6 +84,9 @@ export default function App() {
   const handleLogin = (p: UserProfile) => {
     saveProfile(p);
     setProfile(p);
+    // Register / update user in Firestore for admin analytics
+    const s = getSettings();
+    registerUserActivity(p, { category: s.category, region: s.region, gender: s.gender });
   };
 
   const handleLogout = () => {
