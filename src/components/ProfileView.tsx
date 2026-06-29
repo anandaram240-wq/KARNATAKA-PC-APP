@@ -429,7 +429,6 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
                     <div style={{ color:D.text3 }}>📅 First: <strong style={{ color:D.text2 }}>{firstSeen}</strong></div>
                     <div style={{ color:D.text3 }}>⏰ Last: <strong style={{ color:D.text2 }}>{lastSeen}</strong></div>
                     <div style={{ color:D.text3 }}>🔄 Sessions: <strong style={{ color:D.yellow }}>{u.sessionCount||1}</strong></div>
-                    <div style={{ color:D.text3 }}>🖥 {u.screen||'?'}</div>
                   </div>
 
                   {/* User ID */}
@@ -869,6 +868,7 @@ export default function ProfileView({ onLogout }: Props) {
                   {[
                     { icon: '🏃', label: 'Running',   val: physReqs.run },
                     { icon: '🦘', label: 'Long Jump', val: physReqs.longJump },
+                    { icon: '🪜', label: 'High Jump', val: physReqs.highJump },
                     { icon: '⚾', label: 'Shot Put',  val: physReqs.shotPut },
                   ].map(({ icon, label, val }) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--c-surface-2)', borderRadius: 10, padding: '10px 12px', border: '1px solid var(--c-border)' }}>
