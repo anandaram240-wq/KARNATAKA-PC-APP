@@ -200,20 +200,8 @@ body {
 
 @media (min-width: 768px) {
   .app-shell {
-    max-width: 768px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
-  }
-}
-
-@media (min-width: 1024px) {
-  .app-shell {
-    max-width: 1024px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .app-shell {
-    max-width: 1200px;
+    max-width: 100%;
+    box-shadow: none;
   }
 }
 
@@ -323,19 +311,7 @@ body {
 
 @media (min-width: 768px) {
   .bottom-nav {
-    max-width: 768px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .bottom-nav {
-    max-width: 1024px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .bottom-nav {
-    max-width: 1200px;
+    max-width: 100%;
   }
 }
 
@@ -954,8 +930,12 @@ select:focus, input[type="text"]:focus {
 }
 .empty-icon { font-size: 48px; opacity: 0.5; }
 
-/* ── Page ───────────────────────────────────────────── */
-.page { padding: var(--sp-4); }
+.page {
+  padding: var(--sp-4);
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
 .page-gap { display: flex; flex-direction: column; gap: var(--sp-4); }
 
 /* ── Zone Cards ─────────────────────────────────────── */
