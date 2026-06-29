@@ -1,4 +1,7 @@
-// src/lib/storage.ts — All localStorage persistence
+// src/lib/storage.ts — All localStorage persistence with Firebase Sync
+
+import { syncAnswer, syncTest, syncStreak, syncSettings } from './firebaseSync';
+import allQuestions from '../data/pyqs.json';
 
 const KEYS = {
   answered:  'ksp_answered',   // Record<questionId, {correct,ts}>
@@ -49,6 +52,17 @@ function save(key: string, val: unknown) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
 }
 
+function getActiveEmail(): string | null {
+  try {
+    const s = localStorage.getItem('ksp_user_profile');
+    if (!s) return null;
+    const p = JSON.parse(s);
+    return p.email && p.email !== 'guest@local' ? p.email : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Theme & Language ───────────────────────────────────────────────────────────
 export const getDarkMode = () => load(KEYS.dark, false);
 export const setDarkMode = (v: boolean) => save(KEYS.dark, v);
@@ -58,7 +72,11 @@ export const setLang = (v: 'en' | 'kn') => save(KEYS.lang, v);
 // ── Settings ───────────────────────────────────────────────────────────────────
 export const getSettings = (): UserSettings =>
   load(KEYS.settings, { category: 'General', region: 'NKK', gender: 'M' });
-export const saveSettings = (s: UserSettings) => save(KEYS.settings, s);
+export const saveSettings = (s: UserSettings) => {
+  save(KEYS.settings, s);
+  const email = getActiveEmail();
+  if (email) syncSettings(email, s);
+};
 
 // ── Answered questions ─────────────────────────────────────────────────────────
 export const getAllAnswered = (): Record<number, AnsweredQuestion> =>
@@ -69,6 +87,14 @@ export const markAnswered = (qid: number, correct: boolean, timeSec = 0) => {
   all[qid] = { correct, ts: Date.now(), timeSec };
   save(KEYS.answered, all);
   touchStreak();
+
+  // Replicate to Firebase
+  const email = getActiveEmail();
+  if (email) {
+    const qInfo = (allQuestions as any[]).find(q => q.id === qid);
+    const subject = qInfo ? qInfo.subject : 'Unknown';
+    syncAnswer(email, qid, correct, timeSec, subject);
+  }
 };
 
 export const isAnswered = (qid: number) => qid in getAllAnswered();
@@ -120,6 +146,12 @@ export const saveTestResult = (t: TestResult) => {
   const all = getAllTests();
   all.unshift(t);
   save(KEYS.tests, all.slice(0, 50)); // keep last 50
+
+  // Replicate to Firebase
+  const email = getActiveEmail();
+  if (email) {
+    syncTest(email, t);
+  }
 };
 
 // ── Streak ─────────────────────────────────────────────────────────────────────
@@ -137,12 +169,19 @@ const touchStreak = () => {
   const yStr = yesterday.toISOString().split('T')[0];
   const newStreak = s.lastDate === yStr ? s.current + 1 : 1;
   const days = [...new Set([...s.days, d])].slice(-365);
-  save(KEYS.streak, {
+  const newStreakData = {
     current: newStreak,
     best: Math.max(s.best, newStreak),
     lastDate: d,
     days,
-  });
+  };
+  save(KEYS.streak, newStreakData);
+
+  // Replicate to Firebase
+  const email = getActiveEmail();
+  if (email) {
+    syncStreak(email, newStreakData);
+  }
 };
 
 export const getTodayStudied = () => {

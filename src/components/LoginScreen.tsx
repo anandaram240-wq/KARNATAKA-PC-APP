@@ -284,23 +284,6 @@ export function LoginScreen({ onLogin, isDark, onToggleDark }: LoginScreenProps)
                   <div id="google-btn-container" style={{ position: 'relative', zIndex: 1, borderRadius: 12, overflow: 'hidden', height: 44, width: 300 }} />
                 </div>
               </div>
-
-              {/* Divider */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
-                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.08)' }} />
-                <span style={{ color: 'rgba(165,180,252,.35)', fontSize: 11, fontWeight: 600 }}>OR</span>
-                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.08)' }} />
-              </div>
-
-              {/* Guest Button */}
-              <button className="guest-btn" onClick={handleGuestLogin}>
-                {L.guest}
-                <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(165,180,252,.45)', marginLeft: 2 }}>{L.guestSub}</span>
-              </button>
-
-              <p style={{ color: 'rgba(165,180,252,.35)', fontSize: 11, margin: 0 }}>
-                {L.local}
-              </p>
             </div>
           )}
         </div>

@@ -10,7 +10,7 @@ import PracticeView from './components/PracticeView';
 import MockTestView from './components/MockTestView';
 import InsightsView from './components/InsightsView';
 import ProfileView from './components/ProfileView';
-import { trackVisitor, getOrCreateVid } from './lib/visitorTracker';
+import { trackVisitorLive, pullUserDataFromFirestore, pushLocalToFirestore } from './lib/firebaseSync';
 import { getSettings } from './lib/storage';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -59,20 +59,12 @@ export default function App() {
     return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down); };
   }, []);
 
-  // Track every visitor on load (guest or Google)
+  // Track every visitor on load (Google Auth only)
   useEffect(() => {
     const p = loadProfile();
-    const s = getSettings();
-    if (p) {
-      // Google user already loaded
-      trackVisitor(
-        { name: p.name, email: p.email, avatar: p.avatar, type: p.email === 'guest@local' ? 'guest' : 'google' },
-        { category: s.category, region: s.region, gender: s.gender }
-      );
-    } else {
-      // No profile yet — track as anonymous guest
-      const vid = getOrCreateVid();
-      trackVisitor({ name: `Guest_${vid.slice(-6)}`, email: 'guest@local', avatar: '', type: 'guest' });
+    if (p && p.email !== 'guest@local') {
+      trackVisitorLive(p);
+      pullUserDataFromFirestore(p.email);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -100,19 +92,24 @@ export default function App() {
     setDarkMode(next);
   };
 
-  const handleLogin = (p: UserProfile) => {
+  const handleLogin = async (p: UserProfile) => {
+    if (p.email === 'guest@local') return; // Enforce only Google login
     saveProfile(p);
     setProfile(p);
-    const s = getSettings();
-    // Track Google login — upgrades the visitor record from guest to google
-    trackVisitor(
-      { name: p.name, email: p.email, avatar: p.avatar, type: 'google' },
-      { category: s.category, region: s.region, gender: s.gender }
-    );
+
+    // Sync any existing offline progress to cloud, then pull full history
+    await pushLocalToFirestore(p.email, p);
+    await pullUserDataFromFirestore(p.email);
+    await trackVisitorLive(p);
   };
 
   const handleLogout = () => {
     clearProfile();
+    // Clear local storage metrics on logout to avoid cross-user contamination
+    localStorage.removeItem('ksp_answered');
+    localStorage.removeItem('ksp_tests');
+    localStorage.removeItem('ksp_streak');
+    localStorage.removeItem('ksp_settings');
     setProfile(null);
     setNav({ tab: 'home' });
   };

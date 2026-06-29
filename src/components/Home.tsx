@@ -245,130 +245,144 @@ export default function Home({ lang, onNavigate }: Props) {
         </div>
       </div>
 
-      {/* ── Exam hero card ── */}
-      <div className="card-primary" style={{ borderRadius: 16, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 100, opacity: 0.07 }}>🚔</div>
-        <div style={{ fontSize: 12, fontWeight: 600, opacity: 0.8, marginBottom: 2 }}>
-          {lang === 'kn' ? 'ಕೆಎಸ್ಪಿ ಸಿಪಿಸಿ ಪರೀಕ್ಷೆ' : 'KSP CPC Exam'}
-        </div>
-        <ExamDateInline lang={lang} />
-        <div style={{ fontSize: 12, marginTop: 8, opacity: 0.8 }}>
-          {lang === 'kn' ? '3,991 ಹುದ್ದೆಗಳು • ಅಂದಾಜು 1:70+ ಅನುಪಾತ' : '3,991 vacancies • Est. 1:70+ ratio'}
-        </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-          <button className="btn btn-sm"
-            style={{ flex: 1, background: 'rgba(255,255,255,.18)', color: '#fff', borderRadius: 10, border: 'none', fontWeight: 700 }}
-            onClick={() => onNavigate('test')}>
-            {T('home_start_mock')}
-          </button>
-          <button className="btn btn-sm"
-            style={{ flex: 1, background: 'rgba(255,255,255,.12)', color: '#fff', borderRadius: 10, border: '1px solid rgba(255,255,255,.3)', fontWeight: 700 }}
-            onClick={() => onNavigate('insights')}>
-            {T('home_view_cutoff')}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Personalized Target Cutoff ── */}
-      <TargetCutoffBanner lang={lang} />
-
-      {/* ── Quick stats ── */}
-      <div className="stats-grid">
-        {[
-          { val: todayQs,                              label: T('home_qs_done_today') },
-          { val: `${stats.accuracy}%`,                  label: T('home_accuracy') },
-          { val: avgScore !== null ? `${avgScore}%` : '—', label: T('home_avg_score') },
-          { val: tests.length,                          label: T('home_tests_done') },
-        ].map(({ val, label }) => (
-          <div key={label} className="stat-card">
-            <div className="stat-value">{val}</div>
-            <div className="stat-label">{label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Today's Focus ── */}
-      {focus.length > 0 && (
-        <div className="card">
-          <div className="section-header" style={{ marginBottom: 10 }}>
-            <span className="section-title">{T('home_today_focus')}</span>
-          </div>
-          {focus.map((f, i) => {
-            const labelColor: Record<string, string> = {
-              '🔴 Critical': '#DC2626', '🟠 High': '#EA580C',
-              '🟡 Medium':   '#D97706', '🟢 Done':  '#16A34A',
-            };
-            return (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '10px 0',
-                borderBottom: i < focus.length - 1 ? '1px solid var(--c-border)' : 'none',
-              }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                  background: `${labelColor[f.urgencyLabel] ?? '#64748B'}18`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
-                }}>
-                  {SUBJECT_EMOJI[f.subject] ?? '📌'}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {f.topic}
-                  </div>
-                  <div style={{ fontSize: 11, color: labelColor[f.urgencyLabel] ?? 'var(--c-text-3)', marginTop: 1, fontWeight: 700 }}>
-                    {f.urgencyLabel} · {f.questionCount} Qs
-                  </div>
-                </div>
-                <button className="btn btn-outline btn-sm"
-                  style={{ flexShrink: 0, fontSize: 12, padding: '5px 10px' }}
-                  onClick={() => onNavigate('practice', { topic: f.topic })}>
-                  {T('home_practice_now')}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── Quick Actions ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        {[
-          { icon: '📚', label: T('home_quick_practice'), color: '#1565C0', tab: 'practice' as Tab },
-          { icon: '📝', label: T('home_full_mock'),      color: '#7C3AED', tab: 'test'     as Tab },
-          { icon: '📊', label: T('home_insights'),       color: '#EA580C', tab: 'insights' as Tab },
-          { icon: '👤', label: T('home_progress'),       color: '#16A34A', tab: 'profile'  as Tab },
-        ].map(({ icon, label, color, tab }) => (
-          <button key={tab} className="card card-hover"
-            style={{ border: '1px solid var(--c-border)', cursor: 'pointer', padding: 14, textAlign: 'left', background: 'none', width: '100%' }}
-            onClick={() => onNavigate(tab)}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>{icon}</div>
-            <div style={{ fontWeight: 700, fontSize: 13, color }}>{label}</div>
-          </button>
-        ))}
-      </div>
-
-      {/* ── Rising Topics ── */}
-      {rising.length > 0 && (
-        <div className="card">
-          <div className="section-title" style={{ marginBottom: 10 }}>
-            🔥 {T('home_rising_topics')}
-          </div>
-          {rising.slice(0, 3).map((r, i) => (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 0',
-              borderBottom: i < 2 ? '1px solid var(--c-border)' : 'none',
-            }}>
-              <span style={{ fontSize: 20 }}>{SUBJECT_EMOJI[r.subject] ?? '📌'}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{r.topic}</div>
-                <div style={{ fontSize: 11, color: 'var(--c-text-3)' }}>{r.subject}</div>
-              </div>
-              <span className="badge badge-rising">↑</span>
+      {/* ── Desktop Two Column Layout Wrapper ── */}
+      <div className="home-desktop-grid">
+        
+        {/* Left Column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* ── Exam hero card ── */}
+          <div className="card-primary" style={{ borderRadius: 16, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 100, opacity: 0.07 }}>🚔</div>
+            <div style={{ fontSize: 12, fontWeight: 600, opacity: 0.8, marginBottom: 2 }}>
+              {lang === 'kn' ? 'ಕೆಎಸ್ಪಿ ಸಿಪಿಸಿ ಪರೀಕ್ಷೆ' : 'KSP CPC Exam'}
             </div>
-          ))}
+            <ExamDateInline lang={lang} />
+            <div style={{ fontSize: 12, marginTop: 8, opacity: 0.8 }}>
+              {lang === 'kn' ? '3,991 ಹುದ್ದೆಗಳು • ಅಂದಾಜು 1:70+ ಅನುಪಾತ' : '3,991 vacancies • Est. 1:70+ ratio'}
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+              <button className="btn btn-sm"
+                style={{ flex: 1, background: 'rgba(255,255,255,.18)', color: '#fff', borderRadius: 10, border: 'none', fontWeight: 700 }}
+                onClick={() => onNavigate('test')}>
+                {T('home_start_mock')}
+              </button>
+              <button className="btn btn-sm"
+                style={{ flex: 1, background: 'rgba(255,255,255,.12)', color: '#fff', borderRadius: 10, border: '1px solid rgba(255,255,255,.3)', fontWeight: 700 }}
+                onClick={() => onNavigate('insights')}>
+                {T('home_view_cutoff')}
+              </button>
+            </div>
+          </div>
+
+          {/* ── Personalized Target Cutoff ── */}
+          <TargetCutoffBanner lang={lang} />
+
+          {/* ── Quick stats ── */}
+          <div className="stats-grid">
+            {[
+              { val: todayQs,                              label: T('home_qs_done_today') },
+              { val: `${stats.accuracy}%`,                  label: T('home_accuracy') },
+              { val: avgScore !== null ? `${avgScore}%` : '—', label: T('home_avg_score') },
+              { val: tests.length,                          label: T('home_tests_done') },
+            ].map(({ val, label }) => (
+              <div key={label} className="stat-card">
+                <div className="stat-value">{val}</div>
+                <div className="stat-label">{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* Right Column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* ── Today's Focus ── */}
+          {focus.length > 0 && (
+            <div className="card" style={{ width: '100%', boxSizing: 'border-box' }}>
+              <div className="section-header" style={{ marginBottom: 10 }}>
+                <span className="section-title">{T('home_today_focus')}</span>
+              </div>
+              {focus.map((f, i) => {
+                const labelColor: Record<string, string> = {
+                  '🔴 Critical': '#DC2626', '🟠 High': '#EA580C',
+                  '🟡 Medium':   '#D97706', '🟢 Done':  '#16A34A',
+                };
+                return (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 0',
+                    borderBottom: i < focus.length - 1 ? '1px solid var(--c-border)' : 'none',
+                  }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                      background: `${labelColor[f.label] ?? '#64748B'}18`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
+                    }}>
+                      {SUBJECT_EMOJI[f.subject] ?? '📌'}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {f.topic}
+                      </div>
+                      <div style={{ fontSize: 11, color: labelColor[f.label] ?? 'var(--c-text-3)', marginTop: 1, fontWeight: 700 }}>
+                        {f.label} · {f.totalQuestions} Qs
+                      </div>
+                    </div>
+                    <button className="btn btn-outline btn-sm"
+                      style={{ flexShrink: 0, fontSize: 12, padding: '5px 10px' }}
+                      onClick={() => onNavigate('practice', { topic: f.topic })}>
+                      {T('home_practice_now')}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ── Quick Actions ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[
+              { icon: '📚', label: T('home_quick_practice'), color: '#1565C0', tab: 'practice' as Tab },
+              { icon: '📝', label: T('home_full_mock'),      color: '#7C3AED', tab: 'test'     as Tab },
+              { icon: '📊', label: T('home_insights'),       color: '#EA580C', tab: 'insights' as Tab },
+              { icon: '👤', label: T('home_progress'),       color: '#16A34A', tab: 'profile'  as Tab },
+            ].map(({ icon, label, color, tab }) => (
+              <button key={tab} className="card card-hover"
+                style={{ border: '1px solid var(--c-border)', cursor: 'pointer', padding: 14, textAlign: 'left', background: 'none', width: '100%', boxSizing: 'border-box' }}
+                onClick={() => onNavigate(tab)}>
+                <div style={{ fontSize: 24, marginBottom: 6 }}>{icon}</div>
+                <div style={{ fontWeight: 700, fontSize: 13, color }}>{label}</div>
+              </button>
+            ))}
+          </div>
+
+          {/* ── Rising Topics ── */}
+          {rising.length > 0 && (
+            <div className="card" style={{ width: '100%', boxSizing: 'border-box' }}>
+              <div className="section-title" style={{ marginBottom: 10 }}>
+                🔥 {T('home_rising_topics')}
+              </div>
+              {rising.slice(0, 3).map((r, i) => {
+                const subject = (allQuestions as any[]).find(q => q.topic === r.topic)?.subject || 'Unknown';
+                return (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '8px 0',
+                    borderBottom: i < 2 ? '1px solid var(--c-border)' : 'none',
+                  }}>
+                    <span style={{ fontSize: 20 }}>{SUBJECT_EMOJI[subject] ?? '📌'}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>{r.topic}</div>
+                      <div style={{ fontSize: 11, color: 'var(--c-text-3)' }}>{subject}</div>
+                    </div>
+                    <span className="badge badge-rising">↑</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+      </div>
 
     </div>
   );

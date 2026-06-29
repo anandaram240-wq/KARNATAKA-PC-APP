@@ -189,12 +189,32 @@ body {
 #root { min-height: 100dvh; }
 
 .app-shell {
+  width: 100%;
   max-width: 540px;
   margin: 0 auto;
   min-height: 100dvh;
   background: var(--c-surface);
   position: relative;
   transition: background 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: 768px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-shell {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .app-shell {
+    max-width: 1200px;
+  }
 }
 
 .main-content {
@@ -299,6 +319,24 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
   box-shadow: 0 -4px 16px rgba(0,0,0,.06);
   transition: background 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .bottom-nav {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bottom-nav {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .bottom-nav {
+    max-width: 1200px;
+  }
 }
 
 .nav-item {
@@ -1270,4 +1308,20 @@ select:focus, input[type="text"]:focus {
   border-radius: 50%;
   background: var(--c-text-4);
   flex-shrink: 0;
+}
+
+/* ── Home Page Desktop Layout ── */
+.home-desktop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .home-desktop-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 24px;
+    align-items: start;
+  }
 }

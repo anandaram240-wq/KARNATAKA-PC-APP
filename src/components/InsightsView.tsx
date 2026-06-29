@@ -238,7 +238,7 @@ function YearwiseAnalysis() {
               { label: 'Vacancies (NKK)', val: cutoffEntry?.vacancies ?? '—' },
               { label: 'Applicants (est.)', val: cycleData?.applicants ? `~${(cycleData.applicants / 1000).toFixed(0)}K` : '—' },
               { label: 'Competition Ratio', val: cycleData?.ratio ?? '—' },
-              { label: 'Difficulty', val: cycleData?.difficulty ? '★'.repeat(cycleData.difficulty) : '—' },
+              { label: 'Difficulty', val: cycleData?.paperDifficulty ? '★'.repeat(cycleData.paperDifficulty) : '—' },
               { label: 'Topper Score', val: cycleData?.topperScore ?? '—' },
             ].map(({ label, val }) => (
               <div key={label}>

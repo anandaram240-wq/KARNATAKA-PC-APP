@@ -5,8 +5,7 @@ import { useT } from '../lib/i18n';
 import { getOverallStats, getAllTests, getStreak, getSettings, saveSettings, getAllAnswered } from '../lib/storage';
 import { getLatestCutoff, getCutoffTrend } from '../lib/cutoffEngine';
 import { getPhysicalRequirements } from '../lib/physicalData';
-import { subscribeVisitors } from '../lib/visitorTracker';
-import type { VisitorRecord } from '../lib/visitorTracker';
+import { subscribeUsersLive } from '../lib/firebaseSync';
 import type { UserSettings } from '../lib/storage';
 
 interface UserProfile { name: string; email: string; avatar: string; }
@@ -80,7 +79,7 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
   const [pin,        setPin]        = useState('');
   const [unlocked,   setUnlocked]   = useState(() => sessionStorage.getItem('ksp_admin') === '1');
   const [tab,        setTab]        = useState<'overview'|'users'|'analytics'|'content'|'config'>('overview');
-  const [visitors,   setVisitors]   = useState<VisitorRecord[]>([]);
+  const [visitors,   setVisitors]   = useState<any[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [userSearch, setUserSearch] = useState('');
   const [pulse,      setPulse]      = useState(false);
@@ -94,7 +93,7 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
   useEffect(() => {
     if (!unlocked) return;
     setLoading(true);
-    const unsub = subscribeVisitors((data) => {
+    const unsub = subscribeUsersLive((data) => {
       setVisitors(data);
       setLoading(false);
       setPulse(true);
@@ -207,7 +206,7 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
               ● {loading ? 'CONNECTING' : 'LIVE'}
             </span>
           </div>
-          <div style={{ fontSize:10, color:D.text3, marginTop:1 }}>{totalUsers} visitors tracked · real-time</div>
+          <div style={{ fontSize:10, color:D.text3, marginTop:1 }}>{totalUsers} users tracked · real-time</div>
         </div>
         <button onClick={() => { sessionStorage.removeItem('ksp_admin'); setUnlocked(false); }}
           style={{ background:'rgba(239,68,68,.15)', border:'1px solid rgba(239,68,68,.3)', borderRadius:10, padding:'6px 10px', color:'#FCA5A5', fontSize:11, cursor:'pointer', fontWeight:700 }}>🔒 Lock</button>
@@ -344,8 +343,19 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
               const lastSeen  = (u.lastSeen  as any)?.toDate?.()?.toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) ?? 'Never';
               const firstSeen = (u.firstSeen as any)?.toDate?.()?.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}) ?? '?';
               const isGoogle  = u.type === 'google';
+
+              const attempted = u.totalAttempted || 0;
+              const correct = u.totalCorrect || 0;
+              const wrong = attempted - correct;
+              const accuracy = u.accuracy || 0;
+              const streakCurrent = u.streakCurrent || 0;
+              const streakBest = u.streakBest || 0;
+              const testsCount = u.testsCount || 0;
+              const avgTestScore = u.avgTestScore || 0;
+              const subjStats = u.subjectStats || {};
+
               return (
-                <div key={u.vid} style={{ background:D.card, border:`1px solid ${u.todayActive ? D.green+'40' : D.border}`, borderRadius:16, padding:14, marginBottom:10, backdropFilter:'blur(12px)', position:'relative', overflow:'hidden' }}>
+                <div key={u.uid} style={{ background:D.card, border:`1px solid ${u.todayActive ? D.green+'40' : D.border}`, borderRadius:16, padding:14, marginBottom:10, backdropFilter:'blur(12px)', position:'relative', overflow:'hidden' }}>
                   {u.todayActive && <div style={{ position:'absolute', top:0, right:0, width:3, height:'100%', background:`linear-gradient(180deg,${D.green},transparent)` }} />}
 
                   {/* Header row */}
@@ -365,6 +375,51 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
                     </div>
                   </div>
 
+                  {/* Stats Strip */}
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:6, padding:'10px', background:'rgba(255,255,255,.02)', borderRadius:12, border:`1px solid ${D.border}`, marginBottom:10, textAlign:'center' }}>
+                    <div>
+                      <div style={{ fontSize:9, color:D.text3, fontWeight:700 }}>ATTEMPTED</div>
+                      <div style={{ fontSize:14, fontWeight:800, color:D.text }}>{attempted}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize:9, color:D.text3, fontWeight:700 }}>CORRECT</div>
+                      <div style={{ fontSize:14, fontWeight:800, color:D.green }}>{correct}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize:9, color:D.text3, fontWeight:700 }}>WRONG</div>
+                      <div style={{ fontSize:14, fontWeight:800, color:D.red }}>{wrong}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize:9, color:D.text3, fontWeight:700 }}>ACCURACY</div>
+                      <div style={{ fontSize:14, fontWeight:800, color:D.primary }}>{accuracy}%</div>
+                    </div>
+                  </div>
+
+                  {/* Subject Breakdown */}
+                  {Object.keys(subjStats).length > 0 && (
+                    <div style={{ fontSize:10, color:D.text2, marginBottom:10, padding:'8px 10px', background:'rgba(255,255,255,.01)', borderRadius:10, border:`1px solid ${D.border}` }}>
+                      <div style={{ fontWeight:700, fontSize:10, color:D.text3, marginBottom:4, textTransform:'uppercase' }}>Subject Progress</div>
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:'6px 12px' }}>
+                        {Object.entries(subjStats).map(([subj, data]: [string, any]) => {
+                          const subAtt = data.attempted || 0;
+                          const subCor = data.correct || 0;
+                          const subAcc = subAtt > 0 ? Math.round((subCor / subAtt) * 100) : 0;
+                          return (
+                            <div key={subj}>
+                              <strong style={{ color:D.text }}>{subj}:</strong> {subCor}/{subAtt} ({subAcc}%)
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Extra Info */}
+                  <div style={{ display:'flex', gap:10, flexWrap:'wrap', fontSize:11, color:D.text2, marginBottom:10, borderBottom:`1px dashed ${D.border}`, paddingBottom:8 }}>
+                    <span>🔥 Streak: <strong style={{ color:D.yellow }}>{streakCurrent}d</strong> (best {streakBest}d)</span>
+                    <span>📝 Tests: <strong style={{ color:D.pink }}>{testsCount}</strong> (avg {avgTestScore}%)</span>
+                  </div>
+
                   {/* Info grid */}
                   <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 12px', fontSize:11, background:'rgba(255,255,255,.03)', borderRadius:10, padding:'10px 12px', border:`1px solid ${D.border}` }}>
                     <div style={{ color:D.text3 }}>🌐 IP: <strong style={{ color:D.text }}>{u.ip||'?'}</strong></div>
@@ -377,9 +432,9 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
                     <div style={{ color:D.text3 }}>🖥 {u.screen||'?'}</div>
                   </div>
 
-                  {/* Visitor ID */}
+                  {/* User ID */}
                   <div style={{ marginTop:8, fontSize:9, color:D.text3, fontFamily:'monospace', background:'rgba(255,255,255,.03)', borderRadius:6, padding:'4px 8px', border:`1px solid ${D.border}`, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                    VID: {u.vid}
+                    UID: {u.uid}
                   </div>
                 </div>
               );
