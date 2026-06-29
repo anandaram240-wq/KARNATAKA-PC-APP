@@ -5,8 +5,8 @@ import { useT } from '../lib/i18n';
 import { getOverallStats, getAllTests, getStreak, getSettings, saveSettings, getAllAnswered } from '../lib/storage';
 import { getLatestCutoff, getCutoffTrend } from '../lib/cutoffEngine';
 import { getPhysicalRequirements } from '../lib/physicalData';
-import { getAllUsersAdmin } from '../lib/userRegistry';
-import type { RegistryUser } from '../lib/userRegistry';
+import { subscribeVisitors } from '../lib/visitorTracker';
+import type { VisitorRecord } from '../lib/visitorTracker';
 import type { UserSettings } from '../lib/storage';
 
 interface UserProfile { name: string; email: string; avatar: string; }
@@ -33,11 +33,11 @@ const EXAM_PATTERN = [
 // ADVANCED ADMIN DASHBOARD
 // ─────────────────────────────────────────────────────
 function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: UserProfile | null }) {
-  const [pin,      setPin]      = useState('');
-  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('ksp_admin') === '1');
-  const [tab,      setTab]      = useState<'overview'|'users'|'analytics'|'content'|'settings'>('overview');
-  const [users,    setUsers]    = useState<RegistryUser[]>([]);
-  const [loading,  setLoading]  = useState(false);
+  const [pin,       setPin]       = useState('');
+  const [unlocked,  setUnlocked]  = useState(() => sessionStorage.getItem('ksp_admin') === '1');
+  const [tab,       setTab]       = useState<'overview'|'users'|'analytics'|'content'|'settings'>('overview');
+  const [visitors,  setVisitors]  = useState<VisitorRecord[]>([]);
+  const [loading,   setLoading]   = useState(true);
   const [userSearch, setUserSearch] = useState('');
 
   const stats  = useMemo(() => getOverallStats(), []);
@@ -46,22 +46,29 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
   const settings = useMemo(() => getSettings(), []);
   const answered = useMemo(() => getAllAnswered(), []);
 
-  // Fetch all real users from Firestore
-  const fetchUsers = async () => {
+  // Real-time Firestore subscription — auto updates when any user opens the app
+  useEffect(() => {
+    if (!unlocked) return;
     setLoading(true);
-    try { setUsers(await getAllUsersAdmin()); }
-    catch { /* silent */ }
-    finally { setLoading(false); }
-  };
+    const unsub = subscribeVisitors((data) => {
+      setVisitors(data);
+      setLoading(false);
+    });
+    return unsub; // cleanup on unmount
+  }, [unlocked]);
 
-  useEffect(() => { if (unlocked) fetchUsers(); }, [unlocked]);
+  const users = visitors; // alias for existing code
 
-  // Derived metrics
   const today = new Date().toISOString().split('T')[0];
   const week  = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
-  const todayActive  = users.filter(u => u.todayActive).length;
-  const newThisWeek  = users.filter(u => u.registeredAt && u.registeredAt.toDate().toISOString().split('T')[0] >= week).length;
-  const totalUsers   = users.length;
+  const todayActive  = visitors.filter(u => u.todayActive).length;
+  const newThisWeek  = visitors.filter(u => {
+    const ts = (u.firstSeen as any)?.toMillis?.();
+    return ts && new Date(ts).toISOString().split('T')[0] >= week;
+  }).length;
+  const totalUsers   = visitors.length;
+  const googleUsers  = visitors.filter(u => u.type === 'google').length;
+  const guestUsers   = visitors.filter(u => u.type === 'guest').length;
 
   const avgTestScore = tests.length
     ? Math.round(tests.reduce((s, t) => s + (t.score / t.total) * 100, 0) / tests.length) : 0;
@@ -139,27 +146,31 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
         <button onClick={onBack} style={{ background:'rgba(255,255,255,.15)', border:'none', borderRadius:8, padding:'6px 12px', color:'#fff', fontWeight:700, fontSize:13, cursor:'pointer' }}>← Back</button>
         <div style={{ flex:1 }}>
           <div style={{ fontWeight:800, fontSize:16, color:'#fff' }}>🛡️ Admin Dashboard</div>
-          <div style={{ fontSize:10, color:'rgba(255,255,255,.65)' }}>{ADMIN_EMAIL}</div>
+          <div style={{ fontSize:10, color:'rgba(255,255,255,.65)', display:'flex', alignItems:'center', gap:6 }}>
+            <span style={{ width:6, height:6, borderRadius:'50%', background: loading ? '#FCD34D' : '#4ADE80', display:'inline-block' }} />
+            {loading ? 'Connecting…' : `Live · ${totalUsers} visitors`}
+          </div>
         </div>
-        <button onClick={fetchUsers} style={{ background:'rgba(255,255,255,.15)', border:'none', borderRadius:8, padding:'6px 10px', color:'#fff', fontSize:12, cursor:'pointer', fontWeight:700 }}>🔄 Refresh</button>
-        <button onClick={() => { sessionStorage.removeItem('ksp_admin'); setUnlocked(false); }} style={{ background:'rgba(255,0,0,.2)', border:'1px solid rgba(255,0,0,.4)', borderRadius:8, padding:'5px 10px', color:'#FECACA', fontSize:11, cursor:'pointer', fontWeight:700 }}>🔒</button>
+        <button onClick={() => { sessionStorage.removeItem('ksp_admin'); setUnlocked(false); }} style={{ background:'rgba(255,0,0,.2)', border:'1px solid rgba(255,0,0,.4)', borderRadius:8, padding:'5px 10px', color:'#FECACA', fontSize:11, cursor:'pointer', fontWeight:700 }}>🔒 Lock</button>
       </div>
 
       <div className="page page-gap">
 
-        {/* ── TOP KPI CARDS ── */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:10 }}>
+        {/* ── TOP KPI CARDS — 6 grid ── */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:8 }}>
           {[
-            { icon:'👥', val: loading ? '…' : totalUsers,   label:'Total Users',   color:'#1565C0', bg:'#EFF6FF', border:'#BFDBFE' },
-            { icon:'🟢', val: loading ? '…' : todayActive,  label:'Active Today',  color:'#16A34A', bg:'#F0FDF4', border:'#BBF7D0' },
-            { icon:'🆕', val: loading ? '…' : newThisWeek,  label:'New (7 days)',  color:'#7C3AED', bg:'#FAF5FF', border:'#E9D5FF' },
-            { icon:'🔥', val: streak.current,               label:'Your Streak',   color:'#EA580C', bg:'#FFF7ED', border:'#FED7AA' },
+            { icon:'👥', val: loading ? '⏳' : totalUsers,   label:'Total Visitors', color:'#1565C0', bg:'#EFF6FF', border:'#BFDBFE' },
+            { icon:'🟢', val: loading ? '⏳' : todayActive,  label:'Active Today',   color:'#16A34A', bg:'#F0FDF4', border:'#BBF7D0' },
+            { icon:'🔵', val: loading ? '⏳' : googleUsers,  label:'Google Users',   color:'#1565C0', bg:'#EFF6FF', border:'#93C5FD' },
+            { icon:'👤', val: loading ? '⏳' : guestUsers,   label:'Guest Users',    color:'#7C3AED', bg:'#FAF5FF', border:'#E9D5FF' },
+            { icon:'🆕', val: loading ? '⏳' : newThisWeek,  label:'New (7 days)',   color:'#D97706', bg:'#FFFBEB', border:'#FDE68A' },
+            { icon:'🔥', val: streak.current,                label:'Your Streak',    color:'#EA580C', bg:'#FFF7ED', border:'#FED7AA' },
           ].map(({ icon, val, label, color, bg, border }) => (
-            <div key={label} style={{ background:bg, border:`1.5px solid ${border}`, borderRadius:14, padding:'14px 12px', display:'flex', alignItems:'center', gap:10 }}>
-              <span style={{ fontSize:28 }}>{icon}</span>
+            <div key={label} style={{ background:bg, border:`1.5px solid ${border}`, borderRadius:14, padding:'12px', display:'flex', alignItems:'center', gap:10 }}>
+              <span style={{ fontSize:24 }}>{icon}</span>
               <div>
-                <div style={{ fontWeight:900, fontSize:26, color, lineHeight:1 }}>{val}</div>
-                <div style={{ fontSize:11, color, fontWeight:700, marginTop:2, opacity:.8 }}>{label}</div>
+                <div style={{ fontWeight:900, fontSize:22, color, lineHeight:1 }}>{val}</div>
+                <div style={{ fontSize:10, color, fontWeight:700, marginTop:2, opacity:.85 }}>{label}</div>
               </div>
             </div>
           ))}
@@ -284,44 +295,58 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
               style={{ width:'100%', padding:'10px 14px', borderRadius:10, border:'1.5px solid var(--c-border)', fontSize:13, outline:'none', background:'var(--c-surface-2)' }}
             />
 
-            {/* User list */}
+            {/* Visitor list */}
             <div className="card" style={{ padding:0, overflow:'hidden' }}>
               <div style={{ padding:'12px 16px', borderBottom:'1px solid var(--c-border)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                <div style={{ fontWeight:700, fontSize:13 }}>All Users ({filteredUsers.length})</div>
-                <button onClick={fetchUsers} style={{ background:'none', border:'none', cursor:'pointer', fontSize:13, color:'var(--c-primary)', fontWeight:700 }}>
-                  {loading ? '⏳ Loading…' : '🔄 Refresh'}
-                </button>
+                <div>
+                  <div style={{ fontWeight:700, fontSize:13 }}>All Visitors ({filteredUsers.length})</div>
+                  <div style={{ fontSize:10, color:'var(--c-text-3)' }}>🟢 Real-time · auto-updates</div>
+                </div>
+                <div style={{ display:'flex', gap:8 }}>
+                  <span style={{ fontSize:10, background:'#DBEAFE', color:'#1565C0', borderRadius:20, padding:'3px 8px', fontWeight:700 }}>🔵 {googleUsers} Google</span>
+                  <span style={{ fontSize:10, background:'#EDE9FE', color:'#7C3AED', borderRadius:20, padding:'3px 8px', fontWeight:700 }}>👤 {guestUsers} Guest</span>
+                </div>
               </div>
-              {loading && <div style={{ textAlign:'center', padding:'24px 0', color:'var(--c-text-3)', fontSize:13 }}>Loading users from Firestore…</div>}
+              {loading && <div style={{ textAlign:'center', padding:'24px 0', color:'var(--c-text-3)', fontSize:13 }}>⏳ Connecting to Firestore…</div>}
               {!loading && filteredUsers.length === 0 && (
-                <div style={{ textAlign:'center', padding:'24px 0', color:'var(--c-text-3)', fontSize:13 }}>No users found</div>
+                <div style={{ textAlign:'center', padding:'24px 0', color:'var(--c-text-3)', fontSize:13 }}>No visitors yet</div>
               )}
-              {!loading && filteredUsers.map((u, i) => {
-                const lastActive = u.lastActiveAt ? u.lastActiveAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}) : 'Never';
-                const regDate    = u.registeredAt  ? u.registeredAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'})  : '?';
+              {filteredUsers.map((u, i) => {
+                const lastSeen   = (u.lastSeen   as any)?.toDate?.()?.toLocaleString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) ?? 'Never';
+                const firstSeen  = (u.firstSeen  as any)?.toDate?.()?.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'2-digit'}) ?? '?';
+                const isGoogle   = u.type === 'google';
                 return (
-                  <div key={u.uid} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:i<filteredUsers.length-1?'1px solid var(--c-border)':'none', background:u.todayActive?'rgba(22,163,74,.04)':'none' }}>
-                    {u.avatar
-                      ? <img src={u.avatar} style={{ width:44, height:44, borderRadius:'50%', border:`2px solid ${u.todayActive?'#16A34A':'var(--c-border)'}`, flexShrink:0 }} alt="" />
-                      : <div style={{ width:44, height:44, borderRadius:'50%', background:'linear-gradient(135deg,#1565C0,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:900, fontSize:18, flexShrink:0 }}>{u.name[0]}</div>
-                    }
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap' }}>
-                        <span style={{ fontWeight:700, fontSize:14, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{u.name}</span>
-                        {u.todayActive && <span style={{ fontSize:10, background:'#DCFCE7', color:'#16A34A', borderRadius:20, padding:'1px 8px', fontWeight:700, flexShrink:0 }}>● ACTIVE</span>}
-                        {u.email === ADMIN_EMAIL && <span style={{ fontSize:10, background:'#DBEAFE', color:'#1565C0', borderRadius:20, padding:'1px 8px', fontWeight:700, flexShrink:0 }}>🛡️ Admin</span>}
-                      </div>
-                      <div style={{ fontSize:11, color:'var(--c-text-3)', marginTop:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{u.email}</div>
-                      <div style={{ display:'flex', gap:8, marginTop:4, flexWrap:'wrap' }}>
-                        <span style={{ fontSize:10, background:'var(--c-surface-2)', borderRadius:6, padding:'2px 6px', color:'var(--c-text-3)' }}>{u.category?.replace(/_/g,' ')||'General'}</span>
-                        <span style={{ fontSize:10, background:'var(--c-surface-2)', borderRadius:6, padding:'2px 6px', color:'var(--c-text-3)' }}>{u.region||'NKK'}</span>
-                        <span style={{ fontSize:10, background:'var(--c-surface-2)', borderRadius:6, padding:'2px 6px', color:'var(--c-text-3)' }}>{u.gender==='F'?'Female':'Male'}</span>
+                  <div key={u.vid} style={{ padding:'12px 16px', borderBottom:i<filteredUsers.length-1?'1px solid var(--c-border)':'none', background:u.todayActive?'rgba(22,163,74,.03)':'none' }}>
+                    {/* Row 1: avatar + name + badges */}
+                    <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
+                      {u.avatar
+                        ? <img src={u.avatar} style={{ width:40, height:40, borderRadius:'50%', border:`2px solid ${u.todayActive?'#16A34A':isGoogle?'#93C5FD':'#C4B5FD'}`, flexShrink:0 }} alt="" />
+                        : <div style={{ width:40, height:40, borderRadius:'50%', background:isGoogle?'linear-gradient(135deg,#1565C0,#0EA5E9)':'linear-gradient(135deg,#7C3AED,#A855F7)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:900, fontSize:16, flexShrink:0 }}>{u.name[0]?.toUpperCase()}</div>
+                      }
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
+                          <span style={{ fontWeight:700, fontSize:14 }}>{u.name}</span>
+                          {u.todayActive && <span style={{ fontSize:9, background:'#DCFCE7', color:'#16A34A', borderRadius:20, padding:'1px 7px', fontWeight:800 }}>● ACTIVE</span>}
+                          <span style={{ fontSize:9, background:isGoogle?'#DBEAFE':'#EDE9FE', color:isGoogle?'#1565C0':'#7C3AED', borderRadius:20, padding:'1px 7px', fontWeight:800 }}>{isGoogle?'🔵 Google':'👤 Guest'}</span>
+                          {u.email === ADMIN_EMAIL && <span style={{ fontSize:9, background:'#FEF3C7', color:'#92400E', borderRadius:20, padding:'1px 7px', fontWeight:800 }}>🛡️ Admin</span>}
+                        </div>
+                        <div style={{ fontSize:11, color:'var(--c-text-3)', marginTop:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{u.email}</div>
                       </div>
                     </div>
-                    <div style={{ textAlign:'right', flexShrink:0, fontSize:10, color:'var(--c-text-4)', lineHeight:1.8 }}>
-                      <div>📅 Joined: {regDate}</div>
-                      <div>⏰ Last: {lastActive}</div>
-                      <div>🔄 Sessions: {u.totalSessions}</div>
+                    {/* Row 2: detailed info grid */}
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'4px 12px', fontSize:10, color:'var(--c-text-3)' }}>
+                      <div>🌐 <strong>{u.ip||'?'}</strong></div>
+                      <div>📍 {u.city||'?'}, {u.country||'?'}</div>
+                      <div>📱 {u.device||'?'} · {u.os||'?'}</div>
+                      <div>🔭 {u.browser||'?'} · {u.screen||'?'}</div>
+                      <div>📅 First: {firstSeen}</div>
+                      <div>⏰ Last: {lastSeen}</div>
+                      <div>🔄 Sessions: <strong style={{ color:'var(--c-primary)' }}>{u.sessionCount||1}</strong></div>
+                      <div>🌍 Lang: {u.lang||'?'}</div>
+                    </div>
+                    {/* Row 3: visitor ID */}
+                    <div style={{ marginTop:6, fontSize:9, color:'var(--c-text-4)', fontFamily:'monospace', background:'var(--c-surface-2)', borderRadius:4, padding:'2px 6px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      ID: {u.vid}
                     </div>
                   </div>
                 );
@@ -329,6 +354,7 @@ function AdminDashboard({ onBack, profile }: { onBack: () => void; profile: User
             </div>
           </>
         )}
+
 
         {/* ══════════════ ANALYTICS TAB ══════════════ */}
         {tab === 'analytics' && (

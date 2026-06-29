@@ -2,13 +2,30 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Helper: is the request from the admin account? ────────────────────────
     function isAdmin() {
       return request.auth != null
           && request.auth.token.email == 'anandakiccha240@gmail.com';
     }
 
-    // ── Each user: read/write their own document; admin reads all ─────────────
+    // ── ksp_visitors: ANYONE can write (guest + Google), only admin reads ─────
+    match /ksp_visitors/{visitorId} {
+      allow read: if isAdmin();
+      allow create, update: if true;   // guests & logged-in users both track
+    }
+
+    // ── ksp_users: any auth user writes own doc, admin reads all ─────────────
+    match /ksp_users/{userId} {
+      allow read: if isAdmin();
+      allow create, update: if true;   // allow guest writes too (uid = visitorId)
+    }
+
+    // ── ksp_stats (global counters): anyone can increment, admin reads ────────
+    match /ksp_stats/{docId} {
+      allow read: if isAdmin();
+      allow write: if true;
+    }
+
+    // ── Legacy /users/ collection ─────────────────────────────────────────────
     match /users/{userId} {
       allow read: if request.auth != null && (
         request.auth.uid == userId ||
@@ -25,31 +42,13 @@ service cloud.firestore {
     // ── Visitors: written by trackVisit(), admin reads all ───────────────────
     match /visitors/{docId} {
       allow read: if isAdmin();
-      allow create, update: if request.auth != null;
-    }
-
-    // ── Analytics sessions: server writes, admin reads ───────────────────────
-    match /analytics/{docId} {
-      allow read: if isAdmin();
-      allow write: if false; // server-side only
-    }
-
-    // ── Daily analytics: server writes, admin reads ───────────────────────────
-    match /analytics_daily/{docId} {
-      allow read: if isAdmin();
-      allow write: if false; // server-side only
+      allow create, update: if true;
     }
 
     // ── Admin stats (global counters) ─────────────────────────────────────────
     match /admin_stats/{docId} {
       allow read: if isAdmin();
-      allow write: if request.auth != null; // trackVisit writes here
-    }
-
-    // ── Math/AI solutions: admin reads all ────────────────────────────────────
-    match /math_solutions/{docId} {
-      allow read: if isAdmin();
-      allow write: if false;
+      allow write: if true;
     }
 
     // ── Broadcasts: admin writes, any authenticated user reads ────────────────
@@ -63,22 +62,10 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // ── FCM tokens: user writes own, admin reads all ──────────────────────────
-    match /fcmTokens/{userId} {
-      allow write: if request.auth != null && request.auth.uid == userId;
-      allow read: if isAdmin();
-    }
-
-    // ── Content flags: any user can create, admin reads/updates ──────────────
-    match /contentFlags/{flagId} {
-      allow create: if request.auth != null;
-      allow read, update: if isAdmin();
-    }
-
-    // ── Leaderboard: any logged-in user reads, server writes ─────────────────
+    // ── Leaderboard ───────────────────────────────────────────────────────────
     match /leaderboard/{docId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null; // users update own entry
+      allow write: if request.auth != null;
     }
 
     // ── Deny everything else ──────────────────────────────────────────────────

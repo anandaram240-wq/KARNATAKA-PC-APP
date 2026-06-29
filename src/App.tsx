@@ -10,8 +10,9 @@ import PracticeView from './components/PracticeView';
 import MockTestView from './components/MockTestView';
 import InsightsView from './components/InsightsView';
 import ProfileView from './components/ProfileView';
-import { registerUserActivity } from './lib/userRegistry';
+import { trackVisitor, getOrCreateVid } from './lib/visitorTracker';
 import { getSettings } from './lib/storage';
+import { Analytics } from '@vercel/analytics/react';
 
 type Tab = 'home' | 'practice' | 'test' | 'insights' | 'profile';
 
@@ -58,6 +59,24 @@ export default function App() {
     return () => { window.removeEventListener('online', up); window.removeEventListener('offline', down); };
   }, []);
 
+  // Track every visitor on load (guest or Google)
+  useEffect(() => {
+    const p = loadProfile();
+    const s = getSettings();
+    if (p) {
+      // Google user already loaded
+      trackVisitor(
+        { name: p.name, email: p.email, avatar: p.avatar, type: p.email === 'guest@local' ? 'guest' : 'google' },
+        { category: s.category, region: s.region, gender: s.gender }
+      );
+    } else {
+      // No profile yet — track as anonymous guest
+      const vid = getOrCreateVid();
+      trackVisitor({ name: `Guest_${vid.slice(-6)}`, email: 'guest@local', avatar: '', type: 'guest' });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const navigate = useCallback((tab: Tab, extra?: Record<string, unknown>) => {
     setNav({
       tab,
@@ -84,9 +103,12 @@ export default function App() {
   const handleLogin = (p: UserProfile) => {
     saveProfile(p);
     setProfile(p);
-    // Register / update user in Firestore for admin analytics
     const s = getSettings();
-    registerUserActivity(p, { category: s.category, region: s.region, gender: s.gender });
+    // Track Google login — upgrades the visitor record from guest to google
+    trackVisitor(
+      { name: p.name, email: p.email, avatar: p.avatar, type: 'google' },
+      { category: s.category, region: s.region, gender: s.gender }
+    );
   };
 
   const handleLogout = () => {
@@ -203,6 +225,7 @@ export default function App() {
         </main>
 
         <BottomNav active={nav.tab} onSelect={(tab) => navigate(tab)} />
+        <Analytics />
       </div>
     </LangContext.Provider>
   );
